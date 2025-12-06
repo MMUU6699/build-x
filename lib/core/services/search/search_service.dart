@@ -12,7 +12,7 @@ import 'providers/ollama_search_service.dart';
 import 'providers/jina_search_service.dart';
 import 'providers/bocha_search_service.dart';
 import 'providers/perplexity_search_service.dart';
-import 'providers/duckduckgo_search_service.dart';
+// import 'providers/duckduckgo_search_service.dart'; // Removed
 
 // Base interface for all search services
 abstract class SearchService<T extends SearchServiceOptions> {
@@ -54,7 +54,7 @@ abstract class SearchService<T extends SearchServiceOptions> {
       case PerplexityOptions:
         return PerplexitySearchService() as SearchService;
       case DuckDuckGoOptions:
-        return DuckDuckGoSearchService() as SearchService;
+        return BingSearchService() as SearchService; // Fallback to Bing
       default:
         return BingSearchService() as SearchService;
     }

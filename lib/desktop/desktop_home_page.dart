@@ -220,7 +220,7 @@ class _TitleBarLeading extends StatelessWidget {
         const SizedBox(width: 8),
         // App name
         Text(
-          'Kelivo',
+          'Build X',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,

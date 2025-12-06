@@ -17,7 +17,7 @@ import '../../search/pages/search_services_page.dart';
 import '../../backup/pages/backup_page.dart';
 import '../../quick_phrase/pages/quick_phrases_page.dart';
 import '../../instruction_injection/pages/instruction_injection_page.dart';
-import 'network_proxy_page.dart';
+// import 'network_proxy_page.dart'; // Removed
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../core/services/haptics.dart';
@@ -245,17 +245,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
             ),
-            _iosDivider(context),
-            _iosNavRow(
-              context,
-              icon: Lucide.EthernetPort,
-              label: l10n.settingsPageNetworkProxy,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const NetworkProxyPage()),
-                );
-              },
-            ),
+            // Network Proxy removed
           ]),
 
           const SizedBox(height: 12),

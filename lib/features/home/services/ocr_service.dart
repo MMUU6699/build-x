@@ -68,27 +68,19 @@ class OcrService {
       },
     ];
 
-    final stream = ChatApiService.sendMessageStream(
+    final streamFuture = ChatApiService.sendMessageStream(
       config: cfg,
       modelId: model,
+      prompt: messages.isNotEmpty ? messages.last['content'] ?? '' : '',
       messages: messages,
-      userImagePaths: imagePaths,
-      thinkingBudget: null,
-      temperature: 0.0,
-      topP: null,
-      maxTokens: null,
-      tools: null,
-      onToolCall: null,
-      extraHeaders: null,
-      extraBody: null,
-      stream: false,
     );
 
     String out = '';
     try {
+      final stream = await streamFuture;
       await for (final chunk in stream) {
-        if (chunk.content.isNotEmpty) {
-          out += chunk.content;
+        if (chunk.isNotEmpty) {
+          out += chunk;
         }
       }
     } catch (_) {

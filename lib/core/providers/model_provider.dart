@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'settings_provider.dart';
 import '../services/api_key_manager.dart';
-import 'package:Kelivo/secrets/fallback.dart';
-import '../services/api/google_service_account_auth.dart';
+// Removed fallback secrets and Google auth
 
 enum ModelType { chat, embedding }
 enum Modality { text, image }
@@ -211,10 +210,13 @@ class GoogleProvider extends BaseProvider {
         final jsonStr = (cfg.serviceAccountJson ?? '').trim();
         if (jsonStr.isNotEmpty) {
           try {
-            final token = await GoogleServiceAccountAuth.getAccessTokenFromJson(jsonStr);
-            headers['Authorization'] = 'Bearer $token';
-            final proj = (cfg.projectId ?? '').trim();
-            if (proj.isNotEmpty) headers['X-Goog-User-Project'] = proj;
+            // Google Service Account Auth removed
+            final token = '';
+            if (token.isNotEmpty) {
+              headers['Authorization'] = 'Bearer $token';
+              final proj = (cfg.projectId ?? '').trim();
+              if (proj.isNotEmpty) headers['X-Goog-User-Project'] = proj;
+            }
           } catch (_) {}
         } else {
           final key = ProviderManager._effectiveApiKey(cfg);
@@ -364,7 +366,7 @@ class ProviderManager {
             if (host.contains('siliconflow') && apiKey.trim().isEmpty) {
               final m = modelId.toLowerCase();
               final allowed = m == 'thudm/glm-4-9b-0414' || m == 'qwen/qwen3-8b';
-              final fb = siliconflowFallbackKey.trim();
+              final fb = ''; // Fallback key removed
               if (allowed && fb.isNotEmpty) apiKey = fb;
             }
           }
@@ -470,8 +472,11 @@ class ProviderManager {
           final jsonStr = (cfg.serviceAccountJson ?? '').trim();
           if (jsonStr.isNotEmpty) {
             try {
-              final token = await GoogleServiceAccountAuth.getAccessTokenFromJson(jsonStr);
-              headers['Authorization'] = 'Bearer $token';
+              // Google Service Account Auth removed
+              final token = '';
+              if (token.isNotEmpty) {
+                headers['Authorization'] = 'Bearer $token';
+              }
             } catch (_) {}
           } else if (cfg.apiKey.isNotEmpty) {
             headers['Authorization'] = 'Bearer ${cfg.apiKey}';

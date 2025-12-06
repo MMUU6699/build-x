@@ -114,18 +114,20 @@ class TranslationService {
       // 创建翻译请求
       final provider = settings.getProviderConfig(translateProvider);
 
-      final translationStream = ChatApiService.sendMessageStream(
+      final translationStreamFuture = ChatApiService.sendMessageStream(
         config: provider,
         modelId: translateModelId,
+        prompt: prompt,
         messages: [
           {'role': 'user', 'content': prompt}
         ],
       );
 
       final buffer = StringBuffer();
+      final translationStream = await translationStreamFuture;
 
       await for (final chunk in translationStream) {
-        buffer.write(chunk.content);
+        buffer.write(chunk);
         // 实时更新翻译
         onTranslationUpdate(buffer.toString());
       }

@@ -110,13 +110,15 @@ class _TranslatePageState extends State<TranslatePage> {
       final stream = ChatApiService.sendMessageStream(
         config: cfg,
         modelId: mid,
+        prompt: p,
         messages: [
           {'role': 'user', 'content': p},
         ],
       );
-      _sub = stream.listen(
+      final actualStream = await stream;
+      _sub = actualStream.listen(
         (chunk) {
-          final s = chunk.content;
+          final s = chunk;
           if (_dst.text.isEmpty) {
             // Remove any leading whitespace/newlines from the first chunk to avoid top gap
             final cleaned = s.replaceFirst(RegExp(r'^\s+'), '');

@@ -22,12 +22,33 @@ import 'mermaid_bridge.dart';
 import 'export_capture_scope.dart';
 import 'mermaid_image_cache.dart';
 import 'plantuml_block.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
-import 'package:Kelivo/theme/theme_factory.dart' show getPlatformFontFallback;
+import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/providers/settings_provider.dart';
-import 'package:Kelivo/desktop/html_preview_dialog.dart';
+
+List<String> getPlatformFontFallback() {
+  return ['Arial', 'Helvetica', 'sans-serif'];
+}
+
+Future<void> showHtmlPreviewDesktopDialog(BuildContext context, String html) async {
+  // Simple HTML preview dialog
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('HTML Preview'),
+      content: SingleChildScrollView(
+        child: Text(html),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+}
 
 /// gpt_markdown with custom code block highlight and inline code styling.
 class MarkdownWithCodeHighlight extends StatelessWidget {
@@ -1107,7 +1128,7 @@ class _CollapsibleCodeBlockState extends State<_CollapsibleCodeBlock> {
                               // ignore: use_build_context_synchronously
                               await showHtmlPreviewDesktopDialog(
                                 context,
-                                html: widget.code,
+                                widget.code,
                               );
                             } catch (_) {}
                           }

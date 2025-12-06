@@ -147,18 +147,20 @@ class _DesktopTranslatePageState extends State<DesktopTranslatePage> {
     });
 
     try {
-      final stream = ChatApiService.sendMessageStream(
+      final streamFuture = ChatApiService.sendMessageStream(
         config: cfg,
         modelId: modelId,
+        prompt: prompt,
         messages: [
           {'role': 'user', 'content': prompt},
         ],
       );
 
+      final stream = await streamFuture;
       _subscription = stream.listen(
         (chunk) {
           // live update; remove leading whitespace on first chunk to avoid top gap
-          final s = chunk.content;
+          final s = chunk;
           if (_output.text.isEmpty) {
             _output.text = s.replaceFirst(RegExp(r'^\s+'), '');
           } else {

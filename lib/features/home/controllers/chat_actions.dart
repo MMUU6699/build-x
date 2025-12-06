@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../core/models/chat_input_data.dart';
 import '../../../core/models/chat_message.dart';
 import '../../../core/models/conversation.dart';
-import '../../../core/models/token_usage.dart';
+// import '../../../core/models/token_usage.dart'; // Removed
+import '../../../core/models/chat_stream_chunk.dart';
 import '../../../core/providers/assistant_provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/services/api/chat_api_service.dart';
@@ -431,25 +432,17 @@ class ChatActions {
     final conversationId = state.conversationId;
 
     try {
-      final stream = ChatApiService.sendMessageStream(
+      final streamFuture = ChatApiService.sendMessageStream(
         config: ctx.config,
         modelId: ctx.modelId,
+        prompt: ctx.apiMessages.isNotEmpty ? ctx.apiMessages.last['content'] ?? '' : '',
         messages: ctx.apiMessages,
-        userImagePaths: ctx.userImagePaths,
-        thinkingBudget: assistant?.thinkingBudget ?? ctx.settings.thinkingBudget,
-        temperature: assistant?.temperature,
-        topP: assistant?.topP,
-        maxTokens: assistant?.maxTokens,
-        tools: ctx.toolDefs.isEmpty ? null : ctx.toolDefs,
-        onToolCall: ctx.onToolCall,
-        extraHeaders: ctx.extraHeaders,
-        extraBody: ctx.extraBody,
-        stream: ctx.streamOutput,
       );
 
       await _conversationStreams[conversationId]?.cancel();
+      final stream = await streamFuture;
       final sub = stream.listen(
-        (chunk) => _handleStreamChunk(chunk, state),
+        (chunk) => _handleStreamChunk(ChatStreamChunk(content: chunk), state),
         onError: (e) => _handleStreamError(e, state),
         onDone: () => _handleStreamDone(state),
         cancelOnError: true,
@@ -467,9 +460,9 @@ class ChatActions {
   /// Dispatch stream chunk to appropriate handler.
   Future<void> _handleStreamChunk(
       ChatStreamChunk chunk, stream_ctrl.StreamingState state) async {
-    final chunkContent = chunk.content.isNotEmpty
+    final chunkContent = (chunk.content?.isNotEmpty ?? false)
         ? streamController.captureGeminiThoughtSignature(
-            chunk.content, state.messageId)
+            chunk.content ?? '', state.messageId)
         : '';
 
     // Handle reasoning

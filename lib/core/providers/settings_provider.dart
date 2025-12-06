@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
-import 'package:socks5_proxy/socks_client.dart' as socks;
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -1910,13 +1910,6 @@ class _SocksProxyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = super.createHttpClient(context);
-    try {
-      final List<socks.ProxySettings> proxies = [
-        socks.ProxySettings(InternetAddress(host), port,
-            username: username, password: password),
-      ];
-      socks.SocksTCPClient.assignToHttpClient(client, proxies);
-    } catch (_) {}
     return client;
   }
 }

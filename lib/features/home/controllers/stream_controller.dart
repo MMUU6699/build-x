@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/models/chat_message.dart';
-import '../../../core/models/token_usage.dart';
+// import '../../../core/models/token_usage.dart'; // Removed
+import '../../../core/models/chat_stream_chunk.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/services/api/chat_api_service.dart';
 import '../../../core/services/chat/chat_service.dart';

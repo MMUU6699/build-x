@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 // import 'dart:async';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'features/home/pages/home_page.dart';
+import 'features/auth/pages/login_page.dart';
+import 'features/auth/services/auth_service.dart';
 import 'desktop/desktop_home_page.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
@@ -47,6 +52,14 @@ bool _didEnsureSystemFonts = false; // one-time system fonts load when needed
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+  
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Trim Flutter global image cache to reduce memory pressure from large images
   try {
     PaintingBinding.instance.imageCache.maximumSize = 200;
@@ -77,7 +90,7 @@ Future<void> _initDesktopWindow() async {
       await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
     }
     // Initialize and show desktop window with persisted size/position
-    await DesktopWindowController.instance.initializeAndShow(title: 'Kelivo');
+    await DesktopWindowController.instance.initializeAndShow(title: 'Build X');
   } catch (_) {
     // Ignore on unsupported platforms.
   }
@@ -274,7 +287,7 @@ class MyApp extends StatelessWidget {
               // debugPrint('[Theme/App] Dark scaffoldBg=${dark.colorScheme.surface.value.toRadixString(16)} card≈${dark.colorScheme.surface.value.toRadixString(16)} shadow=${dark.colorScheme.shadow.value.toRadixString(16)}');
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
-                title: 'Kelivo',
+                title: 'Build X',
                 // App UI language; null = follow system (respects iOS per-app language)
                 locale: settings.appLocaleForMaterialApp,
                 supportedLocales: AppLocalizations.supportedLocales,
@@ -284,6 +297,10 @@ class MyApp extends StatelessWidget {
                 themeMode: settings.themeMode,
                 navigatorObservers: <NavigatorObserver>[routeObserver],
                 home: _selectHome(),
+                routes: {
+                  '/login': (context) => const LoginPage(),
+                  '/home': (context) => _selectMainHome(),
+                },
                 builder: (ctx, child) {
                   final bright = Theme.of(ctx).brightness;
                   final overlay = bright == Brightness.dark
@@ -355,6 +372,15 @@ class MyApp extends StatelessWidget {
 }
 
 Widget _selectHome() {
+  // Check authentication status first
+  if (!AuthService.isSignedIn) {
+    return const LoginPage();
+  }
+  
+  return _selectMainHome();
+}
+
+Widget _selectMainHome() {
   // Mobile remains the default platform. Desktop is an added platform.
   if (kIsWeb) return const HomePage();
   final isDesktop = defaultTargetPlatform == TargetPlatform.macOS ||
