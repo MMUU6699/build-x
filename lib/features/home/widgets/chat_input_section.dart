@@ -5,7 +5,7 @@ import '../../../core/models/chat_input_data.dart';
 import '../../../core/models/assistant.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/assistant_provider.dart';
-import '../../../core/providers/mcp_provider.dart';
+// import '../../../core/providers/mcp_provider.dart'; // MCP DISABLED
 import '../../../core/providers/quick_phrase_provider.dart';
 import '../../../core/providers/instruction_injection_provider.dart';
 import '../utils/model_display_helper.dart';
@@ -38,10 +38,8 @@ class ChatInputSection extends StatelessWidget {
     required this.isReasoningModel,
     required this.isReasoningEnabled,
     this.onMore,
-    this.onSelectModel,
-    this.onLongPressSelectModel,
-    this.onOpenMcp,
-    this.onLongPressMcp,
+    // Removed: onSelectModel, onLongPressSelectModel - single API
+    // Removed: onOpenMcp, onLongPressMcp - MCP disabled
     this.onOpenSearch,
     this.onConfigureReasoning,
     this.onSend,
@@ -72,10 +70,8 @@ class ChatInputSection extends StatelessWidget {
 
   // Callbacks
   final VoidCallback? onMore;
-  final VoidCallback? onSelectModel;
-  final VoidCallback? onLongPressSelectModel;
-  final VoidCallback? onOpenMcp;
-  final VoidCallback? onLongPressMcp;
+  // Removed: onSelectModel, onLongPressSelectModel
+  // Removed: onOpenMcp, onLongPressMcp
   final VoidCallback? onOpenSearch;
   final VoidCallback? onConfigureReasoning;
   final ValueChanged<ChatInputData>? onSend;
@@ -118,20 +114,10 @@ class ChatInputSection extends StatelessWidget {
       onToggleSearch: (enabled) {
         context.read<SettingsProvider>().setSearchEnabled(enabled);
       },
-      onSelectModel: onSelectModel,
-      onLongPressSelectModel: onLongPressSelectModel,
-      onOpenMcp: onOpenMcp,
-      onLongPressMcp: onLongPressMcp,
+      // Removed: onSelectModel, onLongPressSelectModel - using single API
+      // Removed: onOpenMcp, onLongPressMcp - MCP disabled
       onStop: onStop,
-      modelIcon: (settings.showModelIcon && pk != null && mid != null)
-          ? CurrentModelIcon(
-              providerKey: pk,
-              modelId: mid,
-              size: 40,
-              withBackground: true,
-              backgroundColor: Colors.transparent,
-            )
-          : null,
+      // Removed: modelIcon - not needed for single API
       focusNode: inputFocus,
       controller: inputController,
       mediaController: mediaController,
@@ -143,8 +129,7 @@ class ChatInputSection extends StatelessWidget {
       onOpenSearch: onOpenSearch,
       onSend: onSend,
       loading: isLoading,
-      showMcpButton: _shouldShowMcpButton(context, settings, a, pk, mid),
-      mcpActive: _isMcpActive(context, a),
+      // Removed: showMcpButton, mcpActive - MCP disabled
       showQuickPhraseButton: _hasQuickPhrases(context, a),
       onQuickPhrase: onQuickPhrase,
       onLongPressQuickPhrase: onLongPressQuickPhrase,
@@ -234,18 +219,22 @@ class ChatInputSection extends StatelessWidget {
     String? pk,
     String? mid,
   ) {
-    final pk2 = a?.chatModelProvider ?? settings.currentModelProvider;
-    final mid3 = a?.chatModelId ?? settings.currentModelId;
-    if (pk2 == null || mid3 == null) return false;
-    final hasEnabledMcp = context.watch<McpProvider>().hasAnyEnabled;
-    return isToolModel(pk2, mid3) && hasEnabledMcp;
+    // MCP DISABLED - always return false
+    // final pk2 = a?.chatModelProvider ?? settings.currentModelProvider;
+    // final mid3 = a?.chatModelId ?? settings.currentModelId;
+    // if (pk2 == null || mid3 == null) return false;
+    // final hasEnabledMcp = context.watch<McpProvider>().hasAnyEnabled;
+    // return isToolModel(pk2, mid3) && hasEnabledMcp;
+    return false;
   }
 
   bool _isMcpActive(BuildContext context, Assistant? a) {
-    final connected = context.watch<McpProvider>().connectedServers;
-    final selected = a?.mcpServerIds ?? const <String>[];
-    if (selected.isEmpty || connected.isEmpty) return false;
-    return connected.any((s) => selected.contains(s.id));
+    // MCP DISABLED - always return false
+    // final connected = context.watch<McpProvider>().connectedServers;
+    // final selected = a?.mcpServerIds ?? const <String>[];
+    // if (selected.isEmpty || connected.isEmpty) return false;
+    // return connected.any((s) => selected.contains(s.id));
+    return false;
   }
 
   bool _hasQuickPhrases(BuildContext context, Assistant? a) {

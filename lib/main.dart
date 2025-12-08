@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, Tar
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'features/home/pages/home_page.dart';
@@ -23,7 +24,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'core/providers/chat_provider.dart';
 import 'core/providers/user_provider.dart';
 import 'core/providers/settings_provider.dart';
-import 'core/providers/mcp_provider.dart';
+// import 'core/providers/mcp_provider.dart'; // MCP DISABLED - using single API
 import 'core/providers/tts_provider.dart';
 import 'core/providers/assistant_provider.dart';
 import 'core/providers/tag_provider.dart';
@@ -34,7 +35,7 @@ import 'core/providers/memory_provider.dart';
 import 'core/providers/backup_provider.dart';
 import 'core/providers/hotkey_provider.dart';
 import 'core/services/chat/chat_service.dart';
-import 'core/services/mcp/mcp_tool_service.dart';
+// import 'core/services/mcp/mcp_tool_service.dart'; // MCP DISABLED
 import 'utils/sandbox_path_resolver.dart';
 import 'shared/widgets/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,6 +44,8 @@ import 'package:flutter/painting.dart' show PaintingBinding;
 import 'dart:io' show HttpOverrides, Platform; // kept for global override usage inside provider
 import 'core/services/android_background.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/firebase_notification_service.dart';
+import 'core/config/api_config.dart';
 
 final RouteObserver<ModalRoute<dynamic>> routeObserver = RouteObserver<ModalRoute<dynamic>>();
 bool _didCheckUpdates = false; // one-time update check flag
@@ -52,6 +55,9 @@ bool _didEnsureSystemFonts = false; // one-time system fonts load when needed
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load API configuration from external source
+  await ApiConfig.loadConfig();
   
   // Load environment variables
   await dotenv.load(fileName: ".env");
@@ -109,8 +115,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ChatService()),
-        ChangeNotifierProvider(create: (_) => McpToolService()),
-        ChangeNotifierProvider(create: (_) => McpProvider()),
+        // ChangeNotifierProvider(create: (_) => McpToolService()), // MCP DISABLED
+        // ChangeNotifierProvider(create: (_) => McpProvider()), // MCP DISABLED
         ChangeNotifierProvider(create: (_) => AssistantProvider()),
         ChangeNotifierProvider(create: (_) => TagProvider()),
         ChangeNotifierProvider(create: (_) => TtsProvider()),
@@ -161,6 +167,16 @@ class MyApp extends StatelessWidget {
               try { context.read<UpdateProvider>().checkForUpdates(); } catch (_) {}
             });
           }
+
+          // Initialize Firebase Notifications
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            try {
+              await FirebaseNotificationService().initialize(context);
+            } catch (e) {
+              print('Error initializing Firebase Notifications: $e');
+            }
+          });
+
           return DynamicColorBuilder(
             builder: (lightDynamic, darkDynamic) {
               // if (lightDynamic != null) {
@@ -328,7 +344,16 @@ class MyApp extends StatelessWidget {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       try { ctx.read<AssistantProvider>().ensureDefaults(ctx); } catch (_) {}
                       try { ctx.read<ChatService>().setDefaultConversationTitle(AppLocalizations.of(ctx)!.chatServiceDefaultConversationTitle); } catch (_) {}
-                      try { ctx.read<UserProvider>().setDefaultNameIfUnset(AppLocalizations.of(ctx)!.userProviderDefaultUserName); } catch (_) {}
+                      // Set user name from Firebase if signed in, otherwise use default
+                      try {
+                        final userProvider = ctx.read<UserProvider>();
+                        final firebaseUser = FirebaseAuth.instance.currentUser;
+                        if (firebaseUser != null && firebaseUser.email != null) {
+                          userProvider.setName(firebaseUser.email!);
+                        } else {
+                          userProvider.setDefaultNameIfUnset(AppLocalizations.of(ctx)!.userProviderDefaultUserName);
+                        }
+                      } catch (_) {}
                     });
                   }
 

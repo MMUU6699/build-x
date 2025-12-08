@@ -38,7 +38,6 @@ class HomeMobileScaffold extends StatelessWidget {
     required this.onNewConversation,
     required this.onOpenMiniMap,
     required this.onCreateNewConversation,
-    required this.onSelectModel,
     required this.body,
   });
 
@@ -55,7 +54,6 @@ class HomeMobileScaffold extends StatelessWidget {
   final VoidCallback onNewConversation;
   final VoidCallback onOpenMiniMap;
   final Future<void> Function() onCreateNewConversation;
-  final VoidCallback onSelectModel;
   final Widget body;
 
   @override
@@ -155,7 +153,7 @@ class HomeMobileScaffold extends StatelessWidget {
               padding: const EdgeInsets.only(top: 2),
               child: InkWell(
                 borderRadius: BorderRadius.circular(6),
-                onTap: onSelectModel,
+                onTap: () {},
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 0),
                   child: AnimatedTextSwap(

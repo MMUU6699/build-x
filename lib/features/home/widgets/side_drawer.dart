@@ -1030,7 +1030,7 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
                     controller: _tabController!,
                     listController: _listController,
                     buildAssistants: () => _buildAssistantsList(context),
-                    buildConversations: () => _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: true),
+                    buildConversations: () => _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: false),
                   );
                 }
                 if (_assistOnly) {
@@ -1049,7 +1049,7 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
                     controller: _listController,
                     padding: EdgeInsets.fromLTRB(10, topPad, 10, 16),
                     children: [
-                      _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: true),
+                      _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: false),
                     ],
                   );
                 }
@@ -1058,7 +1058,7 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
                   isDesktop: _isDesktop,
                   assistantsExpanded: _assistantsExpanded,
                   buildAssistants: () => _buildAssistantsList(context, inlineMode: true),
-                  buildConversations: () => _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: true),
+                  buildConversations: () => _buildConversationsList(context, cs, textBase, chatService, pinnedList, groups, includeUpdateBanner: false),
                 );
               }(),
             ),

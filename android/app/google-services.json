@@ -1,34 +1,49 @@
 {
   "project_info": {
-    "project_number": "123456789",
-    "project_id": "buildx-demo",
-    "storage_bucket": "buildx-demo.appspot.com"
+    "project_number": "92139939502",
+    "project_id": "dpeoij",
+    "storage_bucket": "dpeoij.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789:android:dummy",
+        "mobilesdk_app_id": "1:92139939502:android:bb633e846a512d154c2f3f",
         "android_client_info": {
           "package_name": "com.buildx.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "123456789-dummy.apps.googleusercontent.com",
+          "client_id": "92139939502-isq8o1j9ujqo3ha92vjsphoe5cbu0v5o.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "92139939502-isq8o1j9ujqo3ha92vjsphoe5cbu0v5o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.buildx.app",
+            "certificate_hash": "808116c68d1e7f888577e9e9de058d18c1013e79"
+          }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDummy-android-key"
+          "current_key": "AIzaSyBwSl21NLE4aCFYkFPg2evB7QebWbOXWCk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "123456789-dummy.apps.googleusercontent.com",
+              "client_id": "92139939502-isq8o1j9ujqo3ha92vjsphoe5cbu0v5o.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "92139939502-qgqcodld4m9lv3o44bs9jpcbtf071jf0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.psyche.kelivo"
+              }
             }
           ]
         }

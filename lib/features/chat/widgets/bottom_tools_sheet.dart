@@ -21,6 +21,7 @@ class BottomToolsSheet extends StatelessWidget {
     this.onClear,
     this.clearLabel,
     this.assistantId,
+    this.onBillie,
   });
 
   final VoidCallback? onCamera;
@@ -29,6 +30,7 @@ class BottomToolsSheet extends StatelessWidget {
   final VoidCallback? onClear;
   final String? clearLabel;
   final String? assistantId;
+  final VoidCallback? onBillie;
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +123,16 @@ class BottomToolsSheet extends StatelessWidget {
                           icon: Lucide.Paperclip,
                           label: l10n.bottomToolsSheetUpload,
                           onTap: onUpload,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        roundedAction(
+                          icon: Lucide.Sparkles,
+                          label: 'Billie',
+                          onTap: onBillie,
                         ),
                       ],
                     ),

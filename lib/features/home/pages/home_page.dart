@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../main.dart';
 import '../../../shared/widgets/interactive_drawer.dart';
+import '../../../shared/widgets/snackbar.dart';
 import '../../../shared/responsive/breakpoints.dart';
 import '../../../theme/design_tokens.dart';
 import '../../../icons/lucide_adapter.dart';
@@ -16,6 +17,7 @@ import '../../../core/providers/quick_phrase_provider.dart';
 import '../../../core/providers/instruction_injection_provider.dart';
 import '../../../core/models/quick_phrase.dart';
 import '../../../core/models/chat_message.dart';
+import '../../../core/services/api/chat_api_service.dart';
 import '../../../utils/sandbox_path_resolver.dart';
 import '../../../utils/platform_utils.dart';
 import '../../../desktop/search_provider_popover.dart';
@@ -232,7 +234,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _controller.forceScrollToBottomSoon(animate: false);
         }
       },
-      onSelectModel: () => showModelSelectSheet(context),
       body: _wrapWithDropTarget(_buildMobileBody(context, cs)),
     );
   }
@@ -326,7 +327,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         await _controller.createNewConversationAnimated();
         if (mounted) _controller.forceScrollToBottomSoon(animate: false);
       },
-      onSelectModel: () => showModelSelectSheet(context),
       onSidebarWidthChanged: _controller.updateSidebarWidth,
       onSidebarWidthChangeEnd: _controller.saveSidebarWidth,
       onRightSidebarWidthChanged: _controller.updateRightSidebarWidth,
@@ -553,27 +553,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       isReasoningModel: _controller.isReasoningModel,
       isReasoningEnabled: _controller.isReasoningEnabled,
       onMore: _toggleTools,
-      onSelectModel: () => showModelSelectSheet(context),
-      onLongPressSelectModel: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ProvidersPage()),
-        );
-      },
-      onOpenMcp: () {
-        final a = context.read<AssistantProvider>().currentAssistant;
-        if (a != null) {
-          if (PlatformUtils.isDesktop) {
-            showDesktopMcpServersPopover(context, anchorKey: _inputBarKey, assistantId: a.id);
-          } else {
-            showAssistantMcpSheet(context, assistantId: a.id);
-          }
-        }
-      },
-      onLongPressMcp: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const McpPage()),
-        );
-      },
+      // Removed: onSelectModel, onLongPressSelectModel - using single API model
+      // Removed: onOpenMcp, onLongPressMcp - MCP disabled
       onOpenSearch: _openSearchSettings,
       onConfigureReasoning: () async {
         final assistant = context.read<AssistantProvider>().currentAssistant;
@@ -806,6 +787,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               Navigator.of(ctx).maybePop();
               await _controller.clearContext();
             },
+            onBillie: () {
+              Navigator.of(ctx).maybePop();
+              _onBilliePrediction();
+            },
             clearLabel: _controller.clearContextLabel(),
             assistantId: assistantId,
           ),
@@ -890,4 +875,102 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
     return result;
   }
+
+  Future<void> _onBilliePrediction() async {
+    final messages = _controller.messages;
+    final assistant = context.read<AssistantProvider>().currentAssistant;
+
+    // Check if there are messages to analyze
+    if (messages.isEmpty) {
+      showAppSnackBar(
+        context,
+        message: 'No messages to predict from',
+        type: NotificationType.warning,
+      );
+      return;
+    }
+
+    // Check if model is configured
+    final settings = context.read<SettingsProvider>();
+    final providerKey = assistant?.chatModelProvider ?? settings.currentModelProvider;
+    final modelId = assistant?.chatModelId ?? settings.currentModelId;
+
+    if (providerKey == null || modelId == null) {
+      showAppSnackBar(
+        context,
+        message: 'Please setup a model first',
+        type: NotificationType.warning,
+      );
+      return;
+    }
+
+    // Show loading state
+    showAppSnackBar(
+      context,
+      message: 'Billie is thinking...',
+      type: NotificationType.info,
+    );
+
+    try {
+      // Get provider configuration
+      final config = settings.getProviderConfig(providerKey);
+
+      // Build recent conversation context (last 5 messages)
+      final recentMessages = messages.length > 5 ? messages.sublist(messages.length - 5) : messages;
+      final conversationContext = recentMessages
+          .map((m) => {
+                'role': m.role,
+                'content': m.content.length > 200 ? m.content.substring(0, 200) + '...' : m.content,
+              })
+          .toList();
+
+      // Create prediction prompt
+      const predictionPrompt = '''Based on this conversation, predict what the user might say or do next. 
+Consider the context, tone, and previous messages. 
+Provide a single concise prediction (one sentence, max 20 words) about what the user will likely do or ask next.
+Respond with just the prediction, no explanation.''';
+
+      // Send to model via ChatApiService
+      final stream = await ChatApiService.sendMessageStream(
+        config: config,
+        modelId: modelId,
+        prompt: predictionPrompt,
+        messages: conversationContext,
+      );
+
+      final actualStream = await stream;
+      String prediction = '';
+
+      // Collect the prediction response
+      await for (final chunk in actualStream) {
+        prediction += chunk;
+      }
+
+      prediction = prediction.trim();
+
+      if (prediction.isEmpty) {
+        showAppSnackBar(
+          context,
+          message: 'Billie could not generate a prediction',
+          type: NotificationType.warning,
+        );
+        return;
+      }
+
+      // Show prediction in a snackbar
+      showAppSnackBar(
+        context,
+        message: '💫 Billie: $prediction',
+        type: NotificationType.success,
+        duration: const Duration(seconds: 5),
+      );
+    } catch (e) {
+      showAppSnackBar(
+        context,
+        message: 'Error: ${e.toString()}',
+        type: NotificationType.error,
+      );
+    }
+  }
 }
+

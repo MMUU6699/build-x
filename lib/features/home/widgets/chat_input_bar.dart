@@ -43,24 +43,24 @@ class ChatInputBar extends StatefulWidget {
     super.key,
     this.onSend,
     this.onStop,
-    this.onSelectModel,
-    this.onLongPressSelectModel,
-    this.onOpenMcp,
-    this.onLongPressMcp,
+    // onSelectModel removed - using single API model
+    // onLongPressSelectModel removed
+    // onOpenMcp removed - MCP disabled
+    // onLongPressMcp removed
     this.onToggleSearch,
     this.onOpenSearch,
     this.onMore,
     this.onConfigureReasoning,
     this.moreOpen = false,
     this.focusNode,
-    this.modelIcon,
+    // modelIcon removed - no model selection needed
     this.controller,
     this.mediaController,
     this.loading = false,
     this.reasoningActive = false,
     this.supportsReasoning = true,
-    this.showMcpButton = false,
-    this.mcpActive = false,
+    // showMcpButton removed - MCP disabled
+    // mcpActive removed
     this.searchEnabled = false,
     this.showMiniMapButton = false,
     this.onOpenMiniMap,
@@ -82,24 +82,21 @@ class ChatInputBar extends StatefulWidget {
 
   final ValueChanged<ChatInputData>? onSend;
   final VoidCallback? onStop;
-  final VoidCallback? onSelectModel;
-  final VoidCallback? onLongPressSelectModel;
-  final VoidCallback? onOpenMcp;
-  final VoidCallback? onLongPressMcp;
+  // Removed: onSelectModel, onLongPressSelectModel - using single API model
+  // Removed: onOpenMcp, onLongPressMcp - MCP disabled
   final ValueChanged<bool>? onToggleSearch;
   final VoidCallback? onOpenSearch;
   final VoidCallback? onMore;
   final VoidCallback? onConfigureReasoning;
   final bool moreOpen;
   final FocusNode? focusNode;
-  final Widget? modelIcon;
+  // Removed: modelIcon - no model selection
   final TextEditingController? controller;
   final ChatInputBarController? mediaController;
   final bool loading;
   final bool reasoningActive;
   final bool supportsReasoning;
-  final bool showMcpButton;
-  final bool mcpActive;
+  // Removed: showMcpButton, mcpActive - MCP disabled
   final bool searchEnabled;
   final bool showMiniMapButton;
   final VoidCallback? onOpenMiniMap;
@@ -568,23 +565,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
       builder: (context, constraints) {
         final List<_OverflowAction> actions = [];
 
-        // Model select (always present; can be hidden if overflow)
-        actions.add(_OverflowAction(
-          width: (widget.modelIcon != null) ? modelButtonW : normalButtonW,
-          builder: () => _CompactIconButton(
-            tooltip: l10n.chatInputBarSelectModelTooltip,
-            icon: Lucide.Boxes,
-            child: widget.modelIcon,
-            modelIcon: true,
-            onTap: widget.onSelectModel,
-            onLongPress: widget.onLongPressSelectModel,
-          ),
-          menu: DesktopContextMenuItem(
-            icon: Lucide.Boxes,
-            label: l10n.chatInputBarSelectModelTooltip,
-            onTap: widget.onSelectModel,
-          ),
-        ));
+        // Model selection removed - using single API model only
+        // (previously had model selector with Lucide.Boxes icon)
 
         // Search button (stateful icon depending on provider config)
         final settings = context.watch<SettingsProvider>();
@@ -696,23 +678,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
           ));
         }
 
-        if (widget.showMcpButton) {
-          actions.add(_OverflowAction(
-            width: normalButtonW,
-            builder: () => _CompactIconButton(
-              tooltip: l10n.chatInputBarMcpServersTooltip,
-              icon: Lucide.Hammer,
-              active: widget.mcpActive,
-              onTap: widget.onOpenMcp,
-              onLongPress: widget.onLongPressMcp,
-            ),
-            menu: DesktopContextMenuItem(
-              icon: Lucide.Hammer,
-              label: l10n.chatInputBarMcpServersTooltip,
-              onTap: widget.onOpenMcp,
-            ),
-          ));
-        }
+        // MCP button removed - MCP system disabled in single-API mode
+        // (previously had MCP servers button with Lucide.Hammer icon)
 
         if (widget.showQuickPhraseButton && widget.onQuickPhrase != null) {
           actions.add(_OverflowAction(

@@ -42,7 +42,6 @@ class HomeDesktopScaffold extends StatelessWidget {
     required this.onSelectConversation,
     required this.onNewConversation,
     required this.onCreateNewConversation,
-    required this.onSelectModel,
     required this.onSidebarWidthChanged,
     required this.onSidebarWidthChangeEnd,
     required this.onRightSidebarWidthChanged,
@@ -72,7 +71,6 @@ class HomeDesktopScaffold extends StatelessWidget {
   final void Function(String id) onSelectConversation;
   final VoidCallback onNewConversation;
   final Future<void> Function() onCreateNewConversation;
-  final VoidCallback onSelectModel;
   final void Function(double dx) onSidebarWidthChanged;
   final VoidCallback onSidebarWidthChangeEnd;
   final void Function(double dx) onRightSidebarWidthChanged;
@@ -289,7 +287,7 @@ class HomeDesktopScaffold extends StatelessWidget {
         baseColor: Colors.transparent,
         pressedBlendStrength: isDark ? 0.18 : 0.12,
         padding: EdgeInsets.zero,
-        onTap: onSelectModel,
+        onTap: () {},
         child: AnimatedSize(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,

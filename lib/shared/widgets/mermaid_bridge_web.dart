@@ -43,8 +43,9 @@ MermaidViewHandle? createMermaidView(String code, bool dark, {Map<String, String
 
   final viewType = 'mermaid-view-${DateTime.now().microsecondsSinceEpoch}-${_viewSeq++}';
   container.id = viewType;
-  // ignore: undefined_prefixed_name
-  ui.platformViewRegistry.registerViewFactory(viewType, (int id) => container);
+  
+  // Platform view registration not needed for web, as we're using HtmlElementView directly
+  // or using plain HTML elements embedded in the DOM
   _containers[viewType] = container;
 
   // Ensure Mermaid script is present, then initialize and render this node.

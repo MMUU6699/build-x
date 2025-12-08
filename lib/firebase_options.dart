@@ -41,46 +41,50 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDummy-web-key',
-    appId: '1:123456789:web:dummy',
-    messagingSenderId: '123456789',
-    projectId: 'buildx-demo',
-    authDomain: 'buildx-demo.firebaseapp.com',
-    storageBucket: 'buildx-demo.appspot.com',
+    apiKey: 'AIzaSyDmXiH4OxKMvUea1LN1HsQEzjh1lrgRNvM',
+    appId: '1:92139939502:web:fa42f40c4e94fa204c2f3f',
+    messagingSenderId: '92139939502',
+    projectId: 'dpeoij',
+    authDomain: 'dpeoij.firebaseapp.com',
+    storageBucket: 'dpeoij.firebasestorage.app',
+    measurementId: 'G-LK8JJTYK1J',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDummy-android-key',
-    appId: '1:123456789:android:dummy',
-    messagingSenderId: '123456789',
-    projectId: 'buildx-demo',
-    storageBucket: 'buildx-demo.appspot.com',
+    apiKey: 'AIzaSyBwSl21NLE4aCFYkFPg2evB7QebWbOXWCk',
+    appId: '1:92139939502:android:bb633e846a512d154c2f3f',
+    messagingSenderId: '92139939502',
+    projectId: 'dpeoij',
+    storageBucket: 'dpeoij.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDummy-ios-key',
-    appId: '1:123456789:ios:dummy',
-    messagingSenderId: '123456789',
-    projectId: 'buildx-demo',
-    storageBucket: 'buildx-demo.appspot.com',
-    iosBundleId: 'com.buildx.app',
+    apiKey: 'AIzaSyAiz0CZoEGt0yZa9lEy3RnNAtpzsd_9vyk',
+    appId: '1:92139939502:ios:a4a676e6f59d8aa14c2f3f',
+    messagingSenderId: '92139939502',
+    projectId: 'dpeoij',
+    storageBucket: 'dpeoij.firebasestorage.app',
+    iosBundleId: 'com.psyche.kelivo',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDummy-macos-key',
-    appId: '1:123456789:ios:dummy',
-    messagingSenderId: '123456789',
-    projectId: 'buildx-demo',
-    storageBucket: 'buildx-demo.appspot.com',
-    iosBundleId: 'com.buildx.app',
+    apiKey: 'AIzaSyAiz0CZoEGt0yZa9lEy3RnNAtpzsd_9vyk',
+    appId: '1:92139939502:ios:a4a676e6f59d8aa14c2f3f',
+    messagingSenderId: '92139939502',
+    projectId: 'dpeoij',
+    storageBucket: 'dpeoij.firebasestorage.app',
+    iosClientId: '92139939502-qgqcodld4m9lv3o44bs9jpcbtf071jf0.apps.googleusercontent.com',
+    iosBundleId: 'com.psyche.kelivo',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDummy-windows-key',
-    appId: '1:123456789:web:dummy',
-    messagingSenderId: '123456789',
-    projectId: 'buildx-demo',
-    authDomain: 'buildx-demo.firebaseapp.com',
-    storageBucket: 'buildx-demo.appspot.com',
+    apiKey: 'AIzaSyDmXiH4OxKMvUea1LN1HsQEzjh1lrgRNvM',
+    appId: '1:92139939502:web:000ec8b89de13b4f4c2f3f',
+    messagingSenderId: '92139939502',
+    projectId: 'dpeoij',
+    authDomain: 'dpeoij.firebaseapp.com',
+    storageBucket: 'dpeoij.firebasestorage.app',
+    measurementId: 'G-TSHY6SVBDF',
   );
+
 }

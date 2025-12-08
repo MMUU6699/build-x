@@ -465,11 +465,11 @@ class SettingsProvider extends ChangeNotifier {
       try { _webDavConfig = WebDavConfig.fromJson(jsonDecode(webdavStr) as Map<String, dynamic>); } catch (_) {}
     }
     if (_providerConfigs.isEmpty) {
-      // Seed a couple of sensible defaults on first launch, but do not recreate
-      // providers implicitly during later reads (e.g., when switching chats).
-      ensureProviderConfig('KelivoIN', defaultName: 'KelivoIN');
-      ensureProviderConfig('Tensdaq', defaultName: 'Tensdaq');
-      ensureProviderConfig('SiliconFlow', defaultName: 'SiliconFlow');
+      // Seed BuildX as the only default provider on first launch
+      ensureProviderConfig('BuildX', defaultName: 'BuildX');
+      // Set BuildX as default model
+      _currentModelProvider = 'BuildX';
+      _currentModelId = 'buildx-v1';
     }
     
     // kick off a one-time connectivity test for services (exclude local Bing)
@@ -2106,6 +2106,7 @@ class ProviderConfig {
     
     // Otherwise, infer from the key
     final k = key.toLowerCase();
+    if (k.contains('buildx')) return ProviderKind.openai;
     if (k.contains('gemini') || k.contains('google')) return ProviderKind.google;
     if (k.contains('claude') || k.contains('anthropic')) return ProviderKind.claude;
     return ProviderKind.openai;
@@ -2113,6 +2114,7 @@ class ProviderConfig {
 
   static String _defaultBase(String key) {
     final k = key.toLowerCase();
+    if (k.contains('buildx')) return 'https://taxes-flush-limitation-flame.trycloudflare.com';
     if (k.contains('tensdaq')) return 'https://tensdaq-api.x-aio.com/v1';
     if (k.contains('kelivoin')) return 'https://text.pollinations.ai/openai';
     if (k.contains('openrouter')) return 'https://openrouter.ai/api/v1';
@@ -2130,6 +2132,7 @@ class ProviderConfig {
   static ProviderConfig defaultsFor(String key, {String? displayName}) {
     bool _defaultEnabled(String k) {
       final s = k.toLowerCase();
+      if (s.contains('buildx')) return true;
       if (s.contains('tensdaq')) return true;
       if (s.contains('openai')) return true;
       if (s.contains('gemini') || s.contains('google')) return true;
@@ -2140,6 +2143,38 @@ class ProviderConfig {
     }
     final kind = classify(key);
     final lowerKey = key.toLowerCase();
+    
+    // Special-case BuildX provider
+    if (lowerKey.contains('buildx')) {
+      return ProviderConfig(
+        id: key,
+        enabled: _defaultEnabled(key),
+        name: displayName ?? 'Build X',
+        apiKey: 'buildx-key',
+        baseUrl: 'https://having-compiled-inspired-newfoundland.trycloudflare.com',
+        providerType: ProviderKind.openai,
+        chatPath: '/v1/chat/completions',
+        useResponseApi: false,
+        models: const ['buildx-v1'],
+        modelOverrides: const {
+          'buildx-v1': {
+            'type': 'chat',
+            'input': ['text'],
+            'output': ['text'],
+            'abilities': [],
+          },
+        },
+        proxyEnabled: false,
+        proxyHost: '',
+        proxyPort: '8080',
+        proxyUsername: '',
+        proxyPassword: '',
+        multiKeyEnabled: false,
+        apiKeys: const [],
+        keyManagement: const KeyManagementConfig(),
+      );
+    }
+    
     switch (kind) {
       case ProviderKind.google:
         return ProviderConfig(

@@ -1,0 +1,27 @@
+[build]
+  command = "flutter build web --release --no-wasm-dry-run"
+  publish = "build/web"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production]
+  command = "flutter build web --release --no-wasm-dry-run"
+  publish = "build/web"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/flutter_service_worker.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
+  for = "/*.dart.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

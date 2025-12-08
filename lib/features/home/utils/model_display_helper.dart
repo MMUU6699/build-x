@@ -51,38 +51,10 @@ ModelDisplayInfo getModelDisplayInfo(
   SettingsProvider settings, {
   Assistant? assistant,
 }) {
-  // Determine provider and model from assistant or global defaults
-  final providerKey = assistant?.chatModelProvider ?? settings.currentModelProvider;
-  final modelId = assistant?.chatModelId ?? settings.currentModelId;
-
-  if (providerKey == null || modelId == null) {
-    return const ModelDisplayInfo();
-  }
-
-  final cfg = settings.getProviderConfig(providerKey);
-  final providerName = cfg.name.isNotEmpty ? cfg.name : providerKey;
-
-  // Extract model display name from overrides or use raw modelId
-  String modelDisplay = modelId;
-  final ov = cfg.modelOverrides[modelId] as Map?;
-  if (ov != null) {
-    // Priority: override name > apiModelId > api_model_id > raw modelId
-    final overrideName = (ov['name'] as String?)?.trim();
-    if (overrideName != null && overrideName.isNotEmpty) {
-      modelDisplay = overrideName;
-    } else {
-      final apiId = (ov['apiModelId'] ?? ov['api_model_id'])?.toString().trim();
-      if (apiId != null && apiId.isNotEmpty) {
-        modelDisplay = apiId;
-      }
-    }
-  }
-
-  return ModelDisplayInfo(
-    providerName: providerName,
-    modelDisplay: modelDisplay,
-    providerKey: providerKey,
-    modelId: modelId,
+  // Always display "Build X" as the model name
+  return const ModelDisplayInfo(
+    providerName: 'Build X',
+    modelDisplay: 'Build X',
   );
 }
 

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../icons/lucide_adapter.dart';
 import '../../../core/providers/settings_provider.dart';
-import '../../model/pages/default_model_page.dart';
-import '../../provider/pages/providers_page.dart';
+// import '../../model/pages/default_model_page.dart'; // DISABLED - single model
+// import '../../provider/pages/providers_page.dart'; // DISABLED - no providers UI
 import 'display_settings_page.dart';
 import '../../../core/services/chat/chat_service.dart';
-import '../../mcp/pages/mcp_page.dart';
-import '../../assistant/pages/assistant_settings_page.dart';
+// import '../../mcp/pages/mcp_page.dart'; // MCP DISABLED
+// import '../../assistant/pages/assistant_settings_page.dart'; // DISABLED - single model approach
 import 'about_page.dart';
 import 'tts_services_page.dart';
-import 'sponsor_page.dart';
+// import 'sponsor_page.dart'; // REMOVED - no sponsor page
 import '../../search/pages/search_services_page.dart';
 import '../../backup/pages/backup_page.dart';
 import '../../quick_phrase/pages/quick_phrases_page.dart';
@@ -160,41 +161,43 @@ class SettingsPage extends StatelessWidget {
               },
             ),
             _iosDivider(context),
-            _iosNavRow(
-              context,
-              icon: Lucide.Bot,
-              label: l10n.settingsPageAssistant,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AssistantSettingsPage()),
-                );
-              },
-            ),
+            // Assistant Settings removed - using single model approach
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Bot,
+            //   label: l10n.settingsPageAssistant,
+            //   onTap: () {
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (_) => const AssistantSettingsPage()),
+            //     );
+            //   },
+            // ),
           ]),
 
           const SizedBox(height: 12),
           header(l10n.settingsPageModelsServicesSection),
           _iosSectionCard(children: [
-            _iosNavRow(
-              context,
-              icon: Lucide.Heart,
-              label: l10n.settingsPageDefaultModel,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const DefaultModelPage()),
-                );
-              },
-            ),
-            _iosDivider(context),
-            _iosNavRow(
-              context,
-              icon: Lucide.Boxes,
-              label: l10n.settingsPageProviders,
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProvidersPage()));
-              },
-            ),
-            _iosDivider(context),
+            // Default Model and Providers removed - using single model approach
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Heart,
+            //   label: l10n.settingsPageDefaultModel,
+            //   onTap: () {
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (_) => const DefaultModelPage()),
+            //     );
+            //   },
+            // ),
+            // _iosDivider(context),
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Boxes,
+            //   label: l10n.settingsPageProviders,
+            //   onTap: () {
+            //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProvidersPage()));
+            //   },
+            // ),
+            // _iosDivider(context),
             _iosNavRow(
               context,
               icon: Lucide.Earth,
@@ -217,15 +220,16 @@ class SettingsPage extends StatelessWidget {
               },
             ),
             _iosDivider(context),
-            _iosNavRow(
-              context,
-              icon: Lucide.Terminal,
-              label: l10n.settingsPageMcp,
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const McpPage()));
-              },
-            ),
-            _iosDivider(context),
+            // MCP page removed - using single API model only
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Terminal,
+            //   label: l10n.settingsPageMcp,
+            //   onTap: () {
+            //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const McpPage()));
+            //   },
+            // ),
+            // _iosDivider(context),
             _iosNavRow(
               context,
               icon: Lucide.Zap,
@@ -309,26 +313,69 @@ class SettingsPage extends StatelessWidget {
             _iosDivider(context),
             _iosNavRow(
               context,
-              icon: Lucide.Library,
-              label: l10n.settingsPageDocs,
+              icon: Lucide.Trash,
+              label: 'Sign Out',
               onTap: () async {
-                final uri = Uri.parse('https://kelivo.psycheas.top/');
-                if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                // Show confirmation dialog
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Sign Out'),
+                    content: const Text('Are you sure you want to sign out?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Sign Out'),
+                      ),
+                    ],
+                  ),
+                ) ?? false;
+
+                if (confirmed && context.mounted) {
+                  try {
+                    await FirebaseAuth.instance.signOut();
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Sign out failed: $e')),
+                      );
+                    }
+                  }
                 }
               },
             ),
             _iosDivider(context),
-            _iosNavRow(
-              context,
-              icon: Lucide.Heart,
-              label: l10n.settingsPageSponsor,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SponsorPage()),
-                );
-              },
-            ),
+            // Docs and Sponsor pages removed - using single API model only
+            
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Library,
+            //   label: l10n.settingsPageDocs,
+            //   onTap: () async {
+            //     final uri = Uri.parse('https://kelivo.psycheas.top/');
+            //     if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
+            //       await launchUrl(uri, mode: LaunchMode.externalApplication);
+            //     }
+            //   },
+            // ),
+            // _iosDivider(context),
+            // _iosNavRow(
+            //   context,
+            //   icon: Lucide.Heart,
+            //   label: l10n.settingsPageSponsor,
+            //   onTap: () {
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (_) => const SponsorPage()),
+            //     );
+            //   },
+            // ),
             // _iosDivider(context),
             // _iosNavRow(
             //   context,
