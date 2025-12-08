@@ -1,5 +1,6 @@
 [build]
-  command = "git clone https://github.com/flutter/flutter.git /tmp/flutter && export PATH=$PATH:/tmp/flutter/bin && flutter build web --release --no-wasm-dry-run"
+  # Web is pre-built locally, just deploy it
+  command = "echo 'Deploying pre-built Flutter web...'"
   publish = "build/web"
 
 [[redirects]]
@@ -8,7 +9,8 @@
   status = 200
 
 [context.production]
-  command = "git clone https://github.com/flutter/flutter.git /tmp/flutter && export PATH=$PATH:/tmp/flutter/bin && flutter build web --release --no-wasm-dry-run"
+  # Production: use pre-built web
+  command = "echo 'Production deployment...'"
   publish = "build/web"
 
 [[headers]]
