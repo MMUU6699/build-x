@@ -6,10 +6,9 @@ class ApiConfig {
   static DateTime? _lastLoadTime;
   static const Duration _cacheDuration = Duration(minutes: 30);
 
-  // رابط RAW من Gist
-  // غير الرابط إلى Gist URL الخاص بك
+  // رابط RAW من Gist - يحتوي على API URL الديناميكي
   static const String configUrl =
-      "https://gist.githubusercontent.com/dididj883u/dcd084b749a446a5a2c042715d92bf50/raw/ebf3a5c9f38ff78b47d2b783536a13d512f14427/gistfile1.txt";
+      "https://gist.githubusercontent.com/MMUU6699/f86a0eaee693eafc7867efbd8a1f05aa/raw/e5139c7a6ab75d7e414c9dc7b2be8b9bd77ea6c4/config.json";
 
   /// جلب إعدادات API من Gist
   static Future<void> loadConfig() async {
