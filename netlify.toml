@@ -1,6 +1,6 @@
 [build]
-  # Web is pre-built locally, just deploy it
-  command = "echo 'Deploying pre-built Flutter web...'"
+  # Web is pre-built locally, just deploy it (no build step needed)
+  command = "true"
   publish = "build/web"
 
 [[redirects]]
@@ -10,7 +10,7 @@
 
 [context.production]
   # Production: use pre-built web
-  command = "echo 'Production deployment...'"
+  command = "true"
   publish = "build/web"
 
 [[headers]]

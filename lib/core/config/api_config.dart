@@ -8,7 +8,7 @@ class ApiConfig {
 
   // رابط RAW من Gist - يحتوي على API URL الديناميكي
   static const String configUrl =
-      "https://gist.githubusercontent.com/MMUU6699/f86a0eaee693eafc7867efbd8a1f05aa/raw/e5139c7a6ab75d7e414c9dc7b2be8b9bd77ea6c4/config.json";
+      "https://gist.githubusercontent.com/MMUU6699/f86a0eaee693eafc7867efbd8a1f05aa/raw/e94df04cbab7c1ee313d584ffe787e53291f1646/config.json";
 
   /// جلب إعدادات API من Gist
   static Future<void> loadConfig() async {

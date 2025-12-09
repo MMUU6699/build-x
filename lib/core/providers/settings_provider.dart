@@ -14,6 +14,7 @@ import '../services/haptics.dart';
 import '../../utils/app_directories.dart';
 import '../../utils/sandbox_path_resolver.dart';
 import '../../utils/avatar_cache.dart';
+import '../config/api_config.dart';
 
 // Desktop: topic list position
 enum DesktopTopicPosition { left, right }
@@ -2114,7 +2115,8 @@ class ProviderConfig {
 
   static String _defaultBase(String key) {
     final k = key.toLowerCase();
-    if (k.contains('buildx')) return 'https://taxes-flush-limitation-flame.trycloudflare.com';
+    // BuildX uses Gist configuration
+    if (k.contains('buildx')) return ''; // Will use ApiConfig.apiUrl
     if (k.contains('tensdaq')) return 'https://tensdaq-api.x-aio.com/v1';
     if (k.contains('kelivoin')) return 'https://text.pollinations.ai/openai';
     if (k.contains('openrouter')) return 'https://openrouter.ai/api/v1';
@@ -2144,14 +2146,14 @@ class ProviderConfig {
     final kind = classify(key);
     final lowerKey = key.toLowerCase();
     
-    // Special-case BuildX provider
+    // Special-case BuildX provider - uses dynamic API URL from Gist
     if (lowerKey.contains('buildx')) {
       return ProviderConfig(
         id: key,
         enabled: _defaultEnabled(key),
         name: displayName ?? 'Build X',
         apiKey: 'buildx-key',
-        baseUrl: 'https://having-compiled-inspired-newfoundland.trycloudflare.com',
+        baseUrl: '', // Will use ApiConfig.apiUrl instead (loaded from Gist)
         providerType: ProviderKind.openai,
         chatPath: '/v1/chat/completions',
         useResponseApi: false,
