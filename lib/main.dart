@@ -56,7 +56,7 @@ bool _didEnsureSystemFonts = false; // one-time system fonts load when needed
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load API configuration from external source
+  // Load API configuration from external source (fast)
   await ApiConfig.loadConfig();
   
   // Load environment variables (optional - .env file may not exist)
@@ -67,10 +67,14 @@ Future<void> main() async {
     print('Note: .env file not found, using environment defaults');
   }
   
-  // Initialize Firebase
-  await Firebase.initializeApp(
+  // Initialize Firebase (non-blocking)
+  Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+  ).then((_) {
+    print('✅ Firebase initialized');
+  }).catchError((e) {
+    print('⚠️ Firebase init error: $e');
+  });
   // Trim Flutter global image cache to reduce memory pressure from large images
   try {
     PaintingBinding.instance.imageCache.maximumSize = 200;
