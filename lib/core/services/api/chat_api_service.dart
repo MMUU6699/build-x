@@ -73,10 +73,11 @@ class ChatApiService {
       final baseUrl = _getBaseUrl(config);
 
       if (baseUrl.isEmpty) {
-        print("✗ baseUrl is empty, cannot test connection");
+        print("❌ baseUrl is empty, cannot test connection");
         return false;
       }
 
+      print("🔗 Testing connection to: $baseUrl/models");
       final response = await http.get(
         Uri.parse('$baseUrl/models'),
         headers: {
@@ -84,8 +85,10 @@ class ChatApiService {
         },
       ).timeout(const Duration(seconds: 10));
 
+      print("📊 Response status: ${response.statusCode}");
       return response.statusCode == 200;
     } catch (e) {
+      print("❌ Connection test failed: $e");
       return false;
     }
   }

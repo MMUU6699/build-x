@@ -13,6 +13,7 @@ class ApiConfig {
   /// جلب إعدادات API من Gist
   static Future<void> loadConfig() async {
     try {
+      print("📡 Loading config from: $configUrl");
       final response = await http.get(Uri.parse(configUrl)).timeout(
         const Duration(seconds: 10),
         onTimeout: () {
@@ -21,16 +22,19 @@ class ApiConfig {
       );
 
       if (response.statusCode == 200) {
+        print("📦 Config response received: ${response.body}");
         final data = json.decode(response.body);
         _apiUrl = (data["api_url"] ?? "").toString().trim();
         _lastLoadTime = DateTime.now();
-        print("✓ Loaded API URL: $_apiUrl");
+        print("✅ Loaded API URL: $_apiUrl");
       } else {
-        print("✗ Failed to load config: ${response.statusCode}");
+        print("❌ Failed to load config: ${response.statusCode}");
+        print("Response body: ${response.body}");
         _setDefaultUrl();
       }
     } catch (e) {
-      print("✗ Error loading config: $e");
+      print("❌ Error loading config: $e");
+      print("Stack trace: ${StackTrace.current}");
       _setDefaultUrl();
     }
   }
