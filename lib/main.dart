@@ -46,6 +46,7 @@ import 'core/services/android_background.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/firebase_notification_service.dart';
 import 'core/config/api_config.dart';
+import 'shared/widgets/splash_screen.dart';
 
 final RouteObserver<ModalRoute<dynamic>> routeObserver = RouteObserver<ModalRoute<dynamic>>();
 bool _didCheckUpdates = false; // one-time update check flag
@@ -113,11 +114,44 @@ Future<void> _initDesktopWindow() async {
 
 // Removed eager system font preloading to reduce memory footprint at launch.
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    // Small delay to ensure UI is ready
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) {
+      setState(() => _isInitialized = true);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show splash screen while initializing on web
+    if (!_isInitialized && kIsWeb) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
+      );
+    }
+
+    return _buildMainApp();
+  }
+
+  Widget _buildMainApp() {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ChatProvider()),
