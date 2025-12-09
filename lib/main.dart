@@ -57,8 +57,9 @@ bool _didEnsureSystemFonts = false; // one-time system fonts load when needed
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load API configuration from external source (fast)
+  // Load API configuration from external source
   await ApiConfig.loadConfig();
+  print(ApiConfig.getDebugInfo());
   
   // Load environment variables (optional - .env file may not exist)
   try {

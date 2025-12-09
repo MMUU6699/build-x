@@ -13,7 +13,8 @@ class ApiConfig {
   /// جلب إعدادات API من Gist
   static Future<void> loadConfig() async {
     try {
-      print("📡 Loading config from: $configUrl");
+      final loadTime = DateTime.now();
+      print("📡 [$loadTime] Loading config from: $configUrl");
       final response = await http.get(Uri.parse(configUrl)).timeout(
         const Duration(seconds: 10),
         onTimeout: () {
@@ -22,11 +23,12 @@ class ApiConfig {
       );
 
       if (response.statusCode == 200) {
-        print("📦 Config response received: ${response.body}");
+        print("📦 [$loadTime] Config response received: ${response.body}");
         final data = json.decode(response.body);
         _apiUrl = (data["api_url"] ?? "").toString().trim();
         _lastLoadTime = DateTime.now();
-        print("✅ Loaded API URL: $_apiUrl");
+        print("✅ [$_lastLoadTime] Successfully loaded API URL: $_apiUrl");
+        print("⏱️  Config loaded in ${DateTime.now().difference(loadTime).inMilliseconds}ms");
       } else {
         print("❌ Failed to load config: ${response.statusCode}");
         print("Response body: ${response.body}");
@@ -74,4 +76,20 @@ class ApiConfig {
 
   /// الحصول على وقت آخر تحميل
   static DateTime? get lastLoadTime => _lastLoadTime;
+
+  /// الحصول على معلومات تفصيلية عن حالة التحميل (للـ debugging)
+  static String getDebugInfo() {
+    return '''
+═══════════════════════════════════════════════════════════
+🔍 API Config Debug Info
+═══════════════════════════════════════════════════════════
+📍 Config URL: $configUrl
+✅ Current API URL: $_apiUrl
+📅 Last Load Time: $_lastLoadTime
+⏱️  Cache Duration: ${_cacheDuration.inMinutes} minutes
+🔄 Should Reload: ${shouldReload()}
+💾 Is Loaded: ${isConfigLoaded()}
+═══════════════════════════════════════════════════════════
+''';
+  }
 }
