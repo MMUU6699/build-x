@@ -40,6 +40,15 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      // Verify that authentication tokens are not null
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        if (mounted) {
+          setState(() => _errorMessage = 'Firebase authentication failed: Missing credentials');
+        }
+        return;
+      }
+      
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -52,9 +61,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign in failed: $e')),
-        );
+        setState(() => _errorMessage = 'Sign in failed: $e');
       }
     } finally {
       if (mounted) {

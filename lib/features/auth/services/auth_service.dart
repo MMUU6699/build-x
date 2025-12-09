@@ -14,9 +14,15 @@ class AuthService {
       if (googleUser == null) return null;
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      // Verify that authentication tokens are not null
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        throw Exception('Firebase authentication failed: Missing credentials from Google');
+      }
+      
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken!,
+        idToken: googleAuth.idToken!,
       );
 
       return await _auth.signInWithCredential(credential);

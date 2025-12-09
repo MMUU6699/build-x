@@ -59,8 +59,13 @@ Future<void> main() async {
   // Load API configuration from external source
   await ApiConfig.loadConfig();
   
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
+  // Load environment variables (optional - .env file may not exist)
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // .env file not found or unreadable - continue with defaults
+    print('Note: .env file not found, using environment defaults');
+  }
   
   // Initialize Firebase
   await Firebase.initializeApp(
