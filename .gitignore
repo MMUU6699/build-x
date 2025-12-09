@@ -63,3 +63,4 @@ internationalization.md
 
 # Environment variables
 .env
+build/web/assets/.env
