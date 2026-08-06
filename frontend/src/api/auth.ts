@@ -143,15 +143,6 @@ export interface OAuthSessionRequest {
 }
 
 /**
- * OAuth exchange request — raw authorization code from callback URL.
- */
-export interface OAuthCodeRequest {
-  code: string;
-  redirect_uri: string;
-  client?: string;
-}
-
-/**
  * User login
  * @param request Login credentials
  * @returns Login response with user info and tokens
@@ -163,22 +154,13 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
 
 /**
  * OAuth login — exchange a Supabase-verified access token for a local session.
+ * The browser SDK exchanges the OAuth code for an access_token (using the
+ * stored PKCE code_verifier from localStorage), then posts that token here.
  * @param request Supabase access token obtained via the OAuth PKCE flow
  * @returns Login response with user info and tokens
  */
 export async function oauthLogin(request: OAuthSessionRequest): Promise<LoginResponse> {
   const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/oauth/session', request);
-  return response.data.data;
-}
-
-/**
- * OAuth exchange — send raw OAuth code to backend for server-side exchange.
- * Bypasses browser PKCE verifier issues entirely.
- * @param request Raw OAuth code and redirect_uri
- * @returns Login response with user info and tokens
- */
-export async function oauthExchange(request: OAuthCodeRequest): Promise<LoginResponse> {
-  const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/oauth/exchange', request);
   return response.data.data;
 }
 

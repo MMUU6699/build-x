@@ -192,43 +192,6 @@ class SupabaseAuthClient:
             user=SupabaseUser(id=(data.get("user") or {}).get("id", "")),
         )
 
-    async def exchange_oauth_code(self, code: str, redirect_uri: str) -> SupabaseSignInResult:
-        """Exchange an OAuth authorization code for a Supabase session.
-
-        Uses ``grant_type=authorization_code`` with the service_key so the
-        backend can complete the token exchange without a PKCE code_verifier
-        (the verifier is only required for browser-initiated PKCE flows).
-        """
-        resp = await self._post(
-            "/token?grant_type=authorization_code",
-            {"code": code, "redirect_uri": redirect_uri},
-            admin=True,
-        )
-        if resp.status_code >= 400:
-            data = resp.json()
-            msg = data.get("error_description") or data.get("msg") or data.get("error") or resp.text
-            logger.warning(f"Supabase oauth code exchange failed ({resp.status_code}): {msg}")
-            raise RuntimeError(str(msg))
-        data = resp.json()
-        user = data.get("user", {})
-        metadata = user.get("user_metadata") or {}
-        return SupabaseSignInResult(
-            access_token=data.get("access_token", ""),
-            refresh_token=data.get("refresh_token", ""),
-            user=SupabaseUser(
-                id=user.get("id", ""),
-                email=user.get("email"),
-                fullname=(
-                    metadata.get("full_name")
-                    or metadata.get("fullname")
-                    or metadata.get("user_name")
-                ),
-                is_active=True,
-                role=metadata.get("role", "user"),
-            ),
-        )
-
-
     async def admin_update_user_password(self, user_id: str, new_password: str) -> None:
         resp = await self._post(f"/admin/users/{user_id}", {"password": new_password}, admin=True)
         if resp.status_code >= 400:
