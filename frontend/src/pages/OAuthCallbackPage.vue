@@ -18,17 +18,13 @@ import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { LoaderCircle } from 'lucide-vue-next'
+import { getCachedAuthProvider } from '@/api/config'
 import {
-  getCachedClientConfig,
-  getCachedAuthProvider,
-} from '@/api/config'
-import {
-  oauthLogin,
+  oauthExchange,
   storeToken,
   storeRefreshToken,
   setAuthToken,
 } from '@/api/auth'
-import { getSessionFromOAuthCode } from '@/utils/oauth'
 import { showErrorToast, showSuccessToast } from '@/utils/toast'
 import { useAuth } from '@/composables/useAuth'
 
@@ -60,15 +56,11 @@ onMounted(async () => {
       return
     }
 
-    const config = await getCachedClientConfig()
-    if (!config?.supabase_url || !config?.supabase_anon_key) {
-      showErrorToast(t('OAuth is not configured'))
-      router.replace('/login')
-      return
-    }
-
-    const supabaseAccessToken = await getSessionFromOAuthCode(config, code)
-    const response = await oauthLogin({ access_token: supabaseAccessToken })
+    // Send the raw OAuth code to the backend for server-side exchange.
+    // This bypasses browser PKCE verifier issues entirely — the backend
+    // uses the Supabase service_key to complete the token exchange.
+    const redirectUri = `${window.location.origin}/oauth/callback`
+    const response = await oauthExchange({ code, redirect_uri: redirectUri })
 
     storeToken(response.access_token)
     storeRefreshToken(response.refresh_token)

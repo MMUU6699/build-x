@@ -100,6 +100,24 @@ class OAuthSessionRequest(BaseModel):
         return v.strip()
 
 
+class OAuthCodeRequest(BaseModel):
+    """OAuth exchange request — raw authorization code from OAuth callback URL.
+
+    The backend exchanges this with Supabase server-side (no PKCE verifier
+    needed) and returns a local auth session.
+    """
+    code: str
+    redirect_uri: str
+    client: Optional[str] = "web"
+
+    @field_validator('code')
+    @classmethod
+    def validate_code(cls, v):
+        if not v or len(v.strip()) < 4:
+            raise ValueError("A valid OAuth code is required")
+        return v.strip()
+
+
 class RefreshTokenRequest(BaseModel):
     """Refresh token request — body optional when Cookie/Bearer present."""
     refresh_token: Optional[str] = None

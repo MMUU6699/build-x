@@ -12,7 +12,7 @@ from app.interfaces.dependencies import get_auth_service, get_current_user, get_
 from app.interfaces.schemas.base import APIResponse
 from app.interfaces.schemas.auth import (
     LoginRequest, RegisterRequest, ChangePasswordRequest, ChangeFullnameRequest, RefreshTokenRequest,
-    SendVerificationCodeRequest, ResetPasswordRequest, OAuthSessionRequest,
+    SendVerificationCodeRequest, ResetPasswordRequest, OAuthSessionRequest, OAuthCodeRequest,
     LoginResponse, RegisterResponse, AuthStatusResponse, RefreshTokenResponse,
     UserResponse
 )
@@ -209,6 +209,40 @@ async def oauth_session(
     client = auth_service.parse_client(request.client)
     auth_result = await auth_service.login_with_supabase_token(
         request.access_token,
+        client=client,
+        ip=_client_ip(http_request),
+        user_agent=http_request.headers.get("user-agent"),
+    )
+    _set_session_cookie(response, auth_result.access_token, client)
+    return APIResponse.success(LoginResponse(
+        user=UserResponse.from_domain(auth_result.user),
+        access_token=auth_result.access_token,
+        refresh_token=auth_result.refresh_token or auth_result.access_token,
+        token_type=auth_result.token_type
+    ))
+
+
+@router.post("/oauth/exchange", response_model=APIResponse[LoginResponse])
+async def oauth_exchange(
+    request: OAuthCodeRequest,
+    response: Response,
+    http_request: Request,
+    auth_service: AuthService = Depends(get_auth_service)
+) -> APIResponse[LoginResponse]:
+    """Exchange a raw OAuth authorization code for a local session.
+
+    The frontend posts the raw ?code= from the OAuth callback URL here.
+    The backend exchanges it with Supabase using the service_key (no PKCE
+    verifier needed server-side), then upserts the user profile and mints
+    an opaque auth session.
+    """
+    if get_settings().auth_provider == "none":
+        raise BadRequestError("Authentication is not available")
+
+    client = auth_service.parse_client(request.client)
+    auth_result = await auth_service.login_with_oauth_code(
+        request.code,
+        redirect_uri=request.redirect_uri,
         client=client,
         ip=_client_ip(http_request),
         user_agent=http_request.headers.get("user-agent"),

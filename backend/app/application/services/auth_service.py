@@ -370,6 +370,65 @@ class AuthService:
             user=user,
         )
 
+    async def login_with_oauth_code(
+        self,
+        code: str,
+        redirect_uri: str,
+        client: AuthClientType = AuthClientType.WEB,
+        ip: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> AuthToken:
+        """Exchange a raw OAuth authorization code for a local session.
+
+        The backend calls Supabase ``/token?grant_type=authorization_code``
+        with the service_key — no browser PKCE code_verifier required.
+        """
+        if self.settings.auth_provider == "none":
+            raise BadRequestError("Authentication is not available")
+
+        try:
+            sign_in_result = await self.supabase.exchange_oauth_code(code, redirect_uri)
+        except SupabaseAuthNotConfiguredError as e:
+            raise BadRequestError(str(e))
+        except RuntimeError as e:
+            logger.warning(f"OAuth code exchange failed: {e}")
+            raise UnauthorizedError("OAuth login failed — invalid or expired code")
+
+        supabase_user = sign_in_result.user
+        if not supabase_user.id:
+            raise UnauthorizedError("OAuth login failed — no user returned")
+
+        user = await self.user_repository.get_user_by_id(supabase_user.id)
+        if not user:
+            user = User(
+                id=supabase_user.id,
+                fullname=supabase_user.fullname
+                or (supabase_user.email or "user").split("@")[0],
+                email=supabase_user.email or "",
+                role=UserRole.USER,
+                is_active=True,
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            user = await self.user_repository.create_user(user)
+            logger.info(f"User created from OAuth code exchange: {user.id}")
+        elif not user.is_active:
+            raise UnauthorizedError("User account is inactive")
+        else:
+            user.update_last_login()
+            await self.user_repository.update_user(user)
+
+        session = await self.create_auth_session(
+            user, client=client, ip=ip, user_agent=user_agent
+        )
+        return AuthToken(
+            access_token=session.session_id,
+            refresh_token=session.session_id,
+            token_type="bearer",
+            user=user,
+        )
+
+
     async def refresh_access_token(
         self,
         refresh_token: Optional[str] = None,

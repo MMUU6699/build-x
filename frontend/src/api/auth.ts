@@ -143,6 +143,15 @@ export interface OAuthSessionRequest {
 }
 
 /**
+ * OAuth exchange request — raw authorization code from callback URL.
+ */
+export interface OAuthCodeRequest {
+  code: string;
+  redirect_uri: string;
+  client?: string;
+}
+
+/**
  * User login
  * @param request Login credentials
  * @returns Login response with user info and tokens
@@ -161,6 +170,18 @@ export async function oauthLogin(request: OAuthSessionRequest): Promise<LoginRes
   const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/oauth/session', request);
   return response.data.data;
 }
+
+/**
+ * OAuth exchange — send raw OAuth code to backend for server-side exchange.
+ * Bypasses browser PKCE verifier issues entirely.
+ * @param request Raw OAuth code and redirect_uri
+ * @returns Login response with user info and tokens
+ */
+export async function oauthExchange(request: OAuthCodeRequest): Promise<LoginResponse> {
+  const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/oauth/exchange', request);
+  return response.data.data;
+}
+
 
 /**
  * User registration
