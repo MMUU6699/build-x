@@ -101,7 +101,7 @@ API_KEY=sk-...
 | 配置项 | 默认值 | 是否必需 | 说明 |
 |--------|--------|----------|------|
 | `MONGODB_URI` | `mongodb://mongodb:27017` | 否 | MongoDB 连接字符串 |
-| `MONGODB_DATABASE` | `manus` | 否 | 数据库名称 |
+| `MONGODB_DATABASE` | `build_x` | 否 | 数据库名称 |
 | `MONGODB_USERNAME` | - | 否 | MongoDB 用户名 |
 | `MONGODB_PASSWORD` | - | 否 | MongoDB 密码 |
 
@@ -123,10 +123,10 @@ API_KEY=sk-...
 | 配置项 | 默认值 | 是否必需 | 说明 |
 |--------|--------|----------|------|
 | `SANDBOX_ADDRESS` | - | 否 | 沙箱服务器地址 |
-| `SANDBOX_IMAGE` | `simpleyyt/manus-sandbox` | 否 | Docker 沙箱镜像名称 |
+| `SANDBOX_IMAGE` | `your-dockerhub-username/build-x-sandbox` | 否 | Docker 沙箱镜像名称 |
 | `SANDBOX_NAME_PREFIX` | `sandbox` | 否 | 沙箱容器名称前缀 |
 | `SANDBOX_TTL_MINUTES` | `30` | 否 | 沙箱生存时间（分钟） |
-| `SANDBOX_NETWORK` | `manus-network` | 否 | Docker 网络名称 |
+| `SANDBOX_NETWORK` | `build-x-network` | 否 | Docker 网络名称 |
 | `SANDBOX_CHROME_ARGS` | - | 否 | Chrome 浏览器启动参数 |
 | `SANDBOX_HTTPS_PROXY` | - | 否 | HTTPS 代理设置 |
 | `SANDBOX_HTTP_PROXY` | - | 否 | HTTP 代理设置 |
@@ -137,14 +137,14 @@ API_KEY=sk-...
 | 配置项 | 默认值 | 是否必需 | 说明 |
 |--------|--------|----------|------|
 | `CLAW_ENABLED` | `false` | 否 | 是否启用 Claw 功能，设为 `true` 显示左侧面板入口 |
-| `CLAW_IMAGE` | `simpleyyt/manus-claw` | 否 | Claw Docker 镜像名称 |
-| `CLAW_NAME_PREFIX` | `manus-claw` | 否 | Claw 容器名称前缀 |
+| `CLAW_IMAGE` | `your-dockerhub-username/build-x-claw` | 否 | Claw Docker 镜像名称 |
+| `CLAW_NAME_PREFIX` | `build-x-claw` | 否 | Claw 容器名称前缀 |
 | `CLAW_TTL_SECONDS` | `3600` | 否 | Claw 容器生存时间（秒），设为 `0` 表示不限时 |
 | `CLAW_NETWORK` | - | 否 | Claw 容器使用的 Docker 网络桥名称 |
 | `CLAW_READY_TIMEOUT` | `300` | 否 | 等待 Claw 容器就绪的最大秒数（默认 5 分钟） |
 | `CLAW_ADDRESS` | - | 否 | 固定 Claw 地址（开发环境使用，设置后跳过 Docker 容器创建） |
 | `CLAW_API_KEY` | - | 否 | 静态 API 密钥（开发环境 / 固定容器使用） |
-| `MANUS_API_BASE_URL` | `http://backend:8000` | 否 | 后端 API 地址，供 Claw 容器回调使用 |
+| `BUILD_X_API_BASE_URL` | `http://backend:8000` | 否 | 后端 API 地址，供 Claw 容器回调使用 |
 
 ### 搜索引擎配置
 
@@ -255,7 +255,7 @@ API_KEY=sk-...
 |--------|--------|----------|------|
 | `AUTH_PROVIDER` | `password` | 否 | 认证提供商 (`password`、`none` 或 `local`) |
 | `SHOW_GITHUB_BUTTON` | `true` | 否 | 是否在前端显示 GitHub 按钮 |
-| `GITHUB_REPOSITORY_URL` | `https://github.com/simpleyyt/ai-manus` | 否 | 前端 GitHub 按钮跳转地址 |
+| `GITHUB_REPOSITORY_URL` | `https://github.com/MMUU6699/build-x` | 否 | 前端 GitHub 按钮跳转地址 |
 #### 密码认证配置
 
 仅当 `AUTH_PROVIDER=password` 时使用：
@@ -310,7 +310,7 @@ worker 容器复用 backend 镜像，通过 `start_worker.sh` 脚本启动，在
 
 ```yaml
   worker:
-    image: simpleyyt/manus-backend:latest
+    image: your-dockerhub-username/build-x-backend:latest
     command: ["./start_worker.sh"]
     depends_on:
       - mongodb
@@ -319,7 +319,7 @@ worker 容器复用 backend 镜像，通过 `start_worker.sh` 脚本启动，在
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       - .env
     environment:

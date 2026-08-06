@@ -1,20 +1,20 @@
-# 🤖 AI Manus × Claw Open Source General AI Agent
+# ðŸ¤– Build X Ã— Claw Open Source General AI Agent
 
-Official Site: <https://ai-manus.com>
+Official Site: <https://build-x.example>
 
-GitHub: <https://github.com/simpleyyt/ai-manus> | Demo: <https://app.ai-manus.com>
+GitHub: <https://github.com/MMUU6699/build-x> | Demo: <https://app.build-x.example>
 
-Blog: [Rebuild Manus with WebUI and Sandbox](https://simpleyyt.com/2026/03/07/rebuild-manus-with-webui-and-sandbox/)
+Blog: [Rebuild Build X with WebUI and Sandbox](https://github.com/MMUU6699/build-x)
 
 Join our community: [QQ Group (1005477581)](https://qun.qq.com/universal-share/share?ac=1&authKey=p4X3Da5iMpR4liAenxwvhs7IValPKiCFtUevRlJouz9qSTSZsMnPJc3hzsJjgQYv&busi_data=eyJncm91cENvZGUiOiIxMDA1NDc3NTgxIiwidG9rZW4iOiJNZmUrTmQ0UzNDZDNqNDFVdjVPS1VCRkJGRWVlV0R3RFJSRVFoZDAwRjFDeUdUM0t6aUIyczlVdzRjV1BYN09IIiwidWluIjoiMzQyMjExODE1In0%3D&data=C3B-E6BlEbailV32co77iXL5vxPIhtD9y_itWLSq50hKqosO_55_isOZym2Faaq4hs9-517tUY8GSWaDwPom-A&svctype=4&tempid=h5_group_info)
 
 ---
 
-AI Manus is a general-purpose AI Agent system that can be fully privately deployed and supports running various tools and operations in a sandbox environment. Now with deep **Claw** integration (powered by [OpenClaw](https://github.com/anthropics/openclaw)), delivering the Manus × Claw experience: one-click AI assistant deployment, per-user isolated containers, auto-expiry countdown, and full chat history.
+Build X is a general-purpose AI Agent system that can be fully privately deployed and supports running various tools and operations in a sandbox environment. Now with deep **Claw** integration (powered by [OpenClaw](https://github.com/anthropics/openclaw)), delivering the Build X Ã— Claw experience: one-click AI assistant deployment, per-user isolated containers, auto-expiry countdown, and full chat history.
 
-The goal of AI Manus project is to become a fully privately deployable enterprise-level Manus application. Vertical Manus applications have many repetitive engineering tasks, and this project hopes to unify this part, allowing everyone to build vertical Manus applications like building blocks.
+The goal of Build X project is to become a fully privately deployable enterprise-level Build X application. Vertical Build X applications have many repetitive engineering tasks, and this project hopes to unify this part, allowing everyone to build vertical Build X applications like building blocks.
 
-Each service and tool in AI Manus includes a Built-in version that can be fully privately deployed. Later, through A2A and MCP protocols, both Built-in Agents and Tools can be replaced. The underlying infrastructure can also be replaced by providing diverse provider configurations or simple development adaptations. AI Manus supports distributed multi-instance deployment from the architectural design, facilitating horizontal scaling to meet enterprise-level deployment requirements.
+Each service and tool in Build X includes a Built-in version that can be fully privately deployed. Later, through A2A and MCP protocols, both Built-in Agents and Tools can be replaced. The underlying infrastructure can also be replaced by providing diverse provider configurations or simple development adaptations. Build X supports distributed multi-instance deployment from the architectural design, facilitating horizontal scaling to meet enterprise-level deployment requirements.
 
 ---
 

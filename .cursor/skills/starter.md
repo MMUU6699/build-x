@@ -1,6 +1,6 @@
-# AI Manus – Cloud Agent Starter Skill
+# Build X – Cloud Agent Starter Skill
 
-> Use this skill when setting up, running, or testing any part of the AI Manus codebase.
+> Use this skill when setting up, running, or testing any part of the Build X codebase.
 
 ---
 
@@ -179,7 +179,7 @@ The mockserver tracks a `current_index` for sequential canned responses. It auto
 
 ### MongoDB data
 
-Dev data persists in a named volume `manus-mongodb-data`. To wipe: `./dev.sh down -v`.
+Dev data persists in a named volume `build-x-mongodb-data`. To wipe: `./dev.sh down -v`.
 
 ---
 

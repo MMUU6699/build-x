@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="monacoContainer"
+    dir="ltr" ref="monacoContainer"
     class="h-full w-full"
     :class="panelClass"
   />

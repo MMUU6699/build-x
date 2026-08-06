@@ -4,7 +4,7 @@
     v-if="viewMode === 'grid'"
     role="button"
     tabindex="0"
-    class="clickable relative flex cursor-pointer flex-col overflow-hidden rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] group hover:shadow-[0_7px_16px_0_var(--shadow-S)] text-left w-full"
+    class="clickable relative flex cursor-pointer flex-col overflow-hidden rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] group hover:shadow-[0_7px_16px_0_var(--shadow-S)] text-start w-full"
     @click="emit('open')"
     @keydown.enter="emit('open')">
     <div class="flex items-center gap-2 px-2 py-[10px] relative border-b border-[var(--border-main)]">
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <!-- Official: aspect-[16/9] — preview canvas + hover action (Preview/Visit/Locate) -->
+    <!-- Official: aspect-[16/9] â€” preview canvas + hover action (Preview/Visit/Locate) -->
     <div class="aspect-[16/9] overflow-hidden relative bg-[var(--background-menu-white)]">
       <img
         v-if="previewKind === 'image' && previewUrl"
@@ -59,7 +59,7 @@
           />
         </div>
         <div
-          class="pointer-events-none absolute left-0 right-0 bottom-0 h-[32px]"
+          class="pointer-events-none absolute start-0 end-0 bottom-0 h-[32px]"
           :style="{ background: codeFade }"
         />
       </div>
@@ -91,7 +91,7 @@
     v-else
     role="button"
     tabindex="0"
-    class="clickable group flex cursor-pointer items-center hover:bg-[var(--fill-tsp-white-light)] md:w-[calc(100%+24px)] md:px-[12px] md:-ms-[12px] rounded-lg text-left"
+    class="clickable group flex cursor-pointer items-center hover:bg-[var(--fill-tsp-white-light)] md:w-[calc(100%+24px)] md:px-[12px] md:-ms-[12px] rounded-lg text-start"
     @click="emit('open')"
     @keydown.enter="emit('open')">
     <div
@@ -114,7 +114,7 @@
         </div>
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">
-        <!-- Official eD hover action (group-hover); local always on — no select mode -->
+        <!-- Official eD hover action (group-hover); local always on â€” no select mode -->
         <button
           type="button"
           class="clickable size-7 flex items-center justify-center rounded-md pointer-events-none opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-[var(--fill-tsp-white-main)]"
@@ -217,12 +217,12 @@ const isTextLike = computed(() => {
   ].includes(ext.value);
 });
 
-const canSendToManus = computed(() => !!props.file.file_id);
+const canSendToBuildX = computed(() => !!props.file.file_id);
 
 /**
  * Official libraryUtils.getLibraryAttachmentHoverAction:
- * non-WEBDEV → preview; WEBDEV + url → visit; else locate.
- * Local library items are session files (no WEBDEV) → preview.
+ * non-WEBDEV â†’ preview; WEBDEV + url â†’ visit; else locate.
+ * Local library items are session files (no WEBDEV) â†’ preview.
  */
 const hoverAction = computed<HoverAction>(() => 'preview');
 
@@ -258,8 +258,8 @@ const openMenu = (event: MouseEvent) => {
     createMenuItem('locate', t('Locate in task'), { icon: ExternalLink }),
     createMenuItem('favorite', favorited ? t('Unfavorite') : t('Add to favorites'), { icon: Star }),
   ];
-  if (canSendToManus.value) {
-    items.push(createMenuItem('send', t('Send to Manus'), { icon: MessageSquarePlus }));
+  if (canSendToBuildX.value) {
+    items.push(createMenuItem('send', t('Send to Build X'), { icon: MessageSquarePlus }));
   }
 
   const menuId = props.file.file_id || `${props.file.session_id}:${displayName.value}`;

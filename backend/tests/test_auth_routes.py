@@ -1,10 +1,27 @@
 import pytest
 import logging
+import os
 import requests
 from conftest import BASE_URL
 
 
 logger = logging.getLogger(__name__)
+
+
+_SUPABASE_CONFIGURED = bool(
+    os.environ.get("SUPABASE_URL")
+    and os.environ.get("SUPABASE_ANON_KEY")
+    and os.environ.get("SUPABASE_SERVICE_KEY")
+    and os.environ.get("SUPABASE_JWT_SECRET")
+)
+
+pytestmark = pytest.mark.skipif(
+    not _SUPABASE_CONFIGURED or os.environ.get("AUTH_PROVIDER") == "none",
+    reason=(
+        "Supabase auth not configured: set SUPABASE_URL, SUPABASE_ANON_KEY, "
+        "SUPABASE_SERVICE_KEY, SUPABASE_JWT_SECRET (and AUTH_PROVIDER != none)"
+    ),
+)
 
 
 @pytest.fixture

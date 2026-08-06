@@ -21,10 +21,8 @@ from app.interfaces.dependencies import (
 )
 from app.interfaces.schemas.event import EventMapper
 from app.interfaces.schemas.session import ListSessionItem
-from app.infrastructure.storage.redis import get_redis
 from app.infrastructure.external.session_list import (
-    channel_for_user,
-    parse_notify_payload,
+    subscribe_session_list,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,7 +55,7 @@ def _agent_status_from_session(status: Any) -> str:
 
 
 def _events_after(events: list[Any], last_event_id: Optional[str]) -> list[Any]:
-    """Return domain events strictly after last_event_id (Mongo catch-up)."""
+    """Return domain events strictly after last_event_id (DB catch-up)."""
     if not events:
         return []
     if not last_event_id:
@@ -89,12 +87,6 @@ async def sessions_list_ws(websocket: WebSocket):
     await websocket.accept()
     agent_service = get_agent_service()
 
-    redis = get_redis()
-    await redis.initialize()
-    channel = channel_for_user(user.id)
-    pubsub = redis.client.pubsub()
-    await pubsub.subscribe(channel)
-
     try:
         summaries = await agent_service.get_all_sessions(user.id)
         await websocket.send_json({
@@ -105,21 +97,11 @@ async def sessions_list_ws(websocket: WebSocket):
             ],
         })
 
-        while True:
-            message = await pubsub.get_message(
-                ignore_subscribe_messages=True,
-                timeout=SESSION_LIST_KEEPALIVE_SECONDS,
-            )
-            if message is None:
+        async for payload in subscribe_session_list(
+            user.id, keepalive_seconds=SESSION_LIST_KEEPALIVE_SECONDS
+        ):
+            if payload is None:
                 await websocket.send_json({"op": "ping"})
-                continue
-            if message.get("type") != "message":
-                continue
-            raw = message.get("data", "")
-            if isinstance(raw, (bytes, bytearray)):
-                raw = raw.decode("utf-8", errors="replace")
-            payload = parse_notify_payload(raw)
-            if not payload:
                 continue
             op = payload["op"]
             session_id = payload["session_id"]
@@ -140,12 +122,6 @@ async def sessions_list_ws(websocket: WebSocket):
             await websocket.close(code=1011)
         except Exception:
             pass
-    finally:
-        try:
-            await pubsub.unsubscribe(channel)
-            await pubsub.aclose()
-        except Exception:
-            logger.debug("Failed to close session list pubsub", exc_info=True)
 
 
 @router.websocket("/chat")
@@ -359,7 +335,7 @@ async def chat_ws(websocket: WebSocket):
                 status = _session_status_value(session.status)
                 agent_status = _agent_status_from_session(session.status)
 
-                # Idle/pending/completed/waiting: Mongo catch-up after cursor,
+                # Idle/pending/completed/waiting: DB catch-up after cursor,
                 # then authoritative status_update. Do NOT send stream_end —
                 # a follow-up chat would otherwise clear client "thinking".
                 if status == "running":
@@ -550,7 +526,7 @@ async def claw_ws(websocket: WebSocket):
                 ))
 
                 if not claw_base_url:
-                    refs.append(f'<MANUS_FILE name="{filename}" id="{fid}" status="no_claw" />')
+                    refs.append(f'<BUILD_X_FILE name="{filename}" id="{fid}" status="no_claw" />')
                     continue
 
                 async with httpx.AsyncClient(timeout=30.0) as client:
@@ -565,7 +541,7 @@ async def claw_ws(websocket: WebSocket):
                     local_path = result.get("path", "")
 
                 refs.append(
-                    f'<MANUS_FILE path="{local_path}" name="{filename}" '
+                    f'<BUILD_X_FILE path="{local_path}" name="{filename}" '
                     f'id="{fid}" type="{ct}" size="{info.size}" />'
                 )
                 logger.info("[claw-ws] pushed %s to workspace: %s", filename, local_path)
@@ -573,7 +549,7 @@ async def claw_ws(websocket: WebSocket):
             except Exception as e:
                 logger.warning("[claw-ws] failed to process file %s: %s", fid, e)
                 refs.append(
-                    f'<MANUS_FILE name="{fid}" id="{fid}" status="download_failed" '
+                    f'<BUILD_X_FILE name="{fid}" id="{fid}" status="download_failed" '
                     f'reason="{str(e)[:100]}" />'
                 )
 

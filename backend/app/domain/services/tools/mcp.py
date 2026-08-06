@@ -6,7 +6,10 @@ from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.client.sse import sse_client
-from mcp.client.streamable_http import streamablehttp_client
+try:
+    from mcp.client.streamable_http import streamablehttp_client
+except ImportError:
+    streamablehttp_client = None
 from mcp.types import Tool as MCPToolkit
 
 from app.domain.services.tools.base import BaseToolkit, Tool
@@ -175,6 +178,8 @@ class MCPClientManager:
             if headers:
                 client_params["headers"] = headers
             
+            if not streamablehttp_client:
+                raise NotImplementedError("streamablehttp_client is not supported in this mcp version")
             # 建立 streamable-http 连接
             streamable_transport = await self._exit_stack.enter_async_context(
                 streamablehttp_client(**client_params)

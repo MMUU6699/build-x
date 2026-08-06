@@ -4,7 +4,7 @@ from functools import lru_cache
 from fastapi import Request, Header, HTTPException, status, Depends, Query
 from starlette.websockets import WebSocket
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.infrastructure.external.file.gridfsfile import get_file_storage
+from app.infrastructure.external.file.supabase_storage import get_file_storage
 from app.infrastructure.external.search import get_search_engine
 from app.domain.models.user import User, UserRole
 from app.domain.models.auth_session import CredentialSource
@@ -19,23 +19,23 @@ from app.application.services.token_service import TokenService
 from app.application.services.email_service import EmailService
 from app.infrastructure.external.cache import get_cache
 from app.infrastructure.external.llm import get_llm
-from app.infrastructure.external.session_auth import RedisSessionStore
+from app.infrastructure.external.session_auth import PostgresSessionStore
 
 # Import all required dependencies for agent service
 from app.domain.external.task import Task
 from app.domain.services.agent_task_runner import AgentTaskRunnerFactory
-from app.infrastructure.external.sandbox.docker_sandbox import DockerSandbox
-from app.infrastructure.external.task.redis_task import RedisStreamTask
-from app.infrastructure.repositories.mongo_agent_repository import MongoAgentRepository
-from app.infrastructure.repositories.mongo_session_repository import MongoSessionRepository
+from app.infrastructure.external.sandbox.daytona_sandbox import DaytonaSandbox
+from app.infrastructure.external.task.postgres_task import PostgresStreamTask
+from app.infrastructure.repositories.postgres_agent_repository import PostgresAgentRepository
+from app.infrastructure.repositories.postgres_session_repository import PostgresSessionRepository
 from app.infrastructure.repositories.file_mcp_repository import FileMCPRepository
-from app.infrastructure.repositories.user_repository import MongoUserRepository
-from app.infrastructure.repositories.claw_repository import ClawRepository as MongoClawRepository
+from app.infrastructure.repositories.postgres_user_repository import PostgresUserRepository
+from app.infrastructure.repositories.postgres_claw_repository import PostgresClawRepository
 from app.application.services.claw_service import ClawService
 from app.domain.services.claw_domain_service import ClawDomainService
 from app.application.services.project_service import ProjectService
-from app.infrastructure.repositories.mongo_project_repository import MongoProjectRepository
-from app.infrastructure.repositories.mongo_file_favorite_repository import MongoFileFavoriteRepository
+from app.infrastructure.repositories.postgres_project_repository import PostgresProjectRepository
+from app.infrastructure.repositories.postgres_file_favorite_repository import PostgresFileFavoriteRepository
 
 
 # Configure logging
@@ -54,7 +54,7 @@ def _get_task_cls() -> type[Task]:
         return CeleryTask
     if backend != "local":
         logger.warning("Unknown TASK_BACKEND '%s', falling back to 'local'", backend)
-    return RedisStreamTask
+    return PostgresStreamTask
 
 
 @lru_cache()
@@ -68,9 +68,9 @@ def get_agent_service() -> AgentService:
     logger.info("Creating AgentService instance")
     
     # Create all dependencies
-    agent_repository = MongoAgentRepository()
-    session_repository = MongoSessionRepository()
-    sandbox_cls = DockerSandbox
+    agent_repository = PostgresAgentRepository()
+    session_repository = PostgresSessionRepository()
+    sandbox_cls = DaytonaSandbox
     task_cls = _get_task_cls()
     file_storage = get_file_storage()
     search_engine = get_search_engine()
@@ -88,7 +88,7 @@ def get_agent_service() -> AgentService:
         mcp_repository=mcp_repository,
         llm=llm,
         search_engine=search_engine,
-        project_repository=MongoProjectRepository(),
+        project_repository=PostgresProjectRepository(),
     ))
     
     # Create AgentService instance
@@ -101,7 +101,7 @@ def get_agent_service() -> AgentService:
         search_engine=search_engine,
         mcp_repository=mcp_repository,
         llm=llm,
-        file_favorite_repository=MongoFileFavoriteRepository(),
+        file_favorite_repository=PostgresFileFavoriteRepository(),
     )
 
 
@@ -130,15 +130,15 @@ def get_project_service() -> ProjectService:
     """Get project service instance"""
     logger.info("Creating ProjectService instance")
     return ProjectService(
-        project_repository=MongoProjectRepository(),
-        session_repository=MongoSessionRepository(),
+        project_repository=PostgresProjectRepository(),
+        session_repository=PostgresSessionRepository(),
     )
 
 
 @lru_cache()
-def get_session_store() -> RedisSessionStore:
-    """Get Redis-backed opaque auth session store."""
-    return RedisSessionStore()
+def get_session_store() -> PostgresSessionStore:
+    """Get Postgres-backed opaque auth session store."""
+    return PostgresSessionStore()
 
 
 @lru_cache()
@@ -152,7 +152,7 @@ def get_auth_service() -> AuthService:
     logger.info("Creating AuthService instance")
     
     # Get user repository dependency
-    user_repository = MongoUserRepository()
+    user_repository = PostgresUserRepository()
     
     return AuthService(
         user_repository=user_repository,
@@ -196,14 +196,14 @@ def get_claw_service() -> ClawService:
     """Get claw service instance"""
     logger.info("Creating ClawService instance")
     settings = get_settings()
-    claw_repository = MongoClawRepository()
+    claw_repository = PostgresClawRepository()
 
     if settings.claw_address:
         from app.infrastructure.external.claw.fixed_claw_runtime import FixedClawRuntime
         claw_runtime = FixedClawRuntime(address=settings.claw_address)
     else:
-        from app.infrastructure.external.claw.docker_claw_runtime import DockerClawRuntime
-        claw_runtime = DockerClawRuntime()
+        from app.infrastructure.external.claw.daytona_claw_runtime import DaytonaClawRuntime
+        claw_runtime = DaytonaClawRuntime()
 
     from app.infrastructure.external.claw.http_claw_client import HttpClawClient
     claw_client = HttpClawClient()

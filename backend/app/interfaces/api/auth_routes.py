@@ -12,7 +12,7 @@ from app.interfaces.dependencies import get_auth_service, get_current_user, get_
 from app.interfaces.schemas.base import APIResponse
 from app.interfaces.schemas.auth import (
     LoginRequest, RegisterRequest, ChangePasswordRequest, ChangeFullnameRequest, RefreshTokenRequest,
-    SendVerificationCodeRequest, ResetPasswordRequest,
+    SendVerificationCodeRequest, ResetPasswordRequest, OAuthSessionRequest,
     LoginResponse, RegisterResponse, AuthStatusResponse, RefreshTokenResponse,
     UserResponse
 )
@@ -66,7 +66,7 @@ async def login(
     http_request: Request,
     auth_service: AuthService = Depends(get_auth_service)
 ) -> APIResponse[LoginResponse]:
-    """User login — creates Redis session + Set-Cookie."""
+    """User login — creates auth session + Set-Cookie."""
     client = auth_service.parse_client(request.client)
     auth_result = await auth_service.login_with_session(
         request.email,
@@ -91,7 +91,7 @@ async def register(
     http_request: Request,
     auth_service: AuthService = Depends(get_auth_service)
 ) -> APIResponse[RegisterResponse]:
-    """User registration — creates Redis session + Set-Cookie."""
+    """User registration — creates auth session + Set-Cookie."""
     user = await auth_service.register_user(
         fullname=request.fullname,
         password=request.password,
@@ -188,6 +188,38 @@ async def activate_user(
         raise UnauthorizedError("Admin access required")
     await auth_service.activate_user(user_id)
     return APIResponse.success({})
+
+
+@router.post("/oauth/session", response_model=APIResponse[LoginResponse])
+async def oauth_session(
+    request: OAuthSessionRequest,
+    response: Response,
+    http_request: Request,
+    auth_service: AuthService = Depends(get_auth_service)
+) -> APIResponse[LoginResponse]:
+    """Exchange a Supabase-verified OAuth access token for a local session.
+
+    The browser obtains the token via Supabase PKCE (Google/GitHub), then
+    posts it here. We validate it against Supabase, upsert the profile and
+    mint an opaque auth session (same shape as /auth/login).
+    """
+    if get_settings().auth_provider == "none":
+        raise BadRequestError("Authentication is not available")
+
+    client = auth_service.parse_client(request.client)
+    auth_result = await auth_service.login_with_supabase_token(
+        request.access_token,
+        client=client,
+        ip=_client_ip(http_request),
+        user_agent=http_request.headers.get("user-agent"),
+    )
+    _set_session_cookie(response, auth_result.access_token, client)
+    return APIResponse.success(LoginResponse(
+        user=UserResponse.from_domain(auth_result.user),
+        access_token=auth_result.access_token,
+        refresh_token=auth_result.refresh_token or auth_result.access_token,
+        token_type=auth_result.token_type
+    ))
 
 
 @router.post("/refresh", response_model=APIResponse[RefreshTokenResponse])

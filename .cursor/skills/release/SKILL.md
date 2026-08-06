@@ -1,7 +1,7 @@
 ---
 name: release
 description: >-
-  Cut ai-manus GitHub version releases (vX.Y.Z) with bilingual notes matching
+  Cut Build X GitHub version releases (vX.Y.Z) with bilingual notes matching
   v2.4.0 / v2.5.0. Use when the user asks to release, tag a version, publish
   release notes, bump Latest, or delete mistaken demo-only / non-version
   releases. Do not use for README demo MP4 uploads (see demo-videos skill).
@@ -11,7 +11,7 @@ description: >-
 
 Dedicated skill for **product version releases**. Not for demo video hosting.
 
-Reference release: https://github.com/Simpleyyt/ai-manus/releases/tag/v2.5.0
+Reference release: https://github.com/MMUU6699/build-x/releases/tag/v2.5.0
 
 ## Hard rules
 
@@ -38,14 +38,14 @@ Doc sync → `.cursor/skills/update-docs/SKILL.md`.
 * …
 
 ## 与上一个版本的差异 / Diff from previous release
-* Compare: https://github.com/Simpleyyt/ai-manus/compare/vA.B.C...vX.Y.Z
+* Compare: https://github.com/MMUU6699/build-x/compare/vA.B.C...vX.Y.Z
 * Stats: N files changed, +X insertions(+), -Y deletions(-).
 
 ## 关键变更 / Key Changes
 * <PR title> (#N)
 * …
 
-**Full Changelog**: https://github.com/Simpleyyt/ai-manus/compare/vA.B.C...vX.Y.Z
+**Full Changelog**: https://github.com/MMUU6699/build-x/compare/vA.B.C...vX.Y.Z
 ```
 
 - **更新日志 / Changelog**: thematic bullets (features, fixes, docs) — not every commit.

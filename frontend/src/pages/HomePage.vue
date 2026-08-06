@@ -2,13 +2,13 @@
   <SimpleBar>
     <div
       class="flex flex-col h-full flex-1 min-w-0 mx-auto w-full sm:min-w-[390px] px-5 justify-center items-start gap-2 relative max-w-full sm:max-w-full">
-      <!-- 顶部 header(结构复刻自 manus.im 首页头部,标题固定为 Manus、无下拉) -->
+      <!-- é¡¶éƒ¨ header(ç»“æž„å¤åˆ»è‡ª manus.im é¦–é¡µå¤´éƒ¨,æ ‡é¢˜å›ºå®šä¸º Build Xã€æ— ä¸‹æ‹‰) -->
       <div class="w-[calc(100%+40px)] -mx-5 bg-[var(--background-gray-main)] sticky top-0 z-10 ps-[14px] pe-[20px] py-[12px] border-b border-transparent">
         <div class="flex justify-between items-center w-full">
           <div class="relative z-20 overflow-hidden items-center flex-shrink-0 flex">
             <div class="flex items-center">
-              <div class="flex h-8 pt-[7px] md:pr-[6px] pr-[4px] pb-[7px] md:pl-[8px] pl-[6px] justify-center items-center gap-1 rounded-[8px]">
-                <span class="text-[var(--text-primary)] md:text-[18px] text-[16px] font-[500] md:leading-[22px] leading-[20px] truncate">Manus</span>
+              <div class="flex h-8 pt-[7px] md:pe-[6px] pe-[4px] pb-[7px] md:ps-[8px] ps-[6px] justify-center items-center gap-1 rounded-[8px]">
+                <span class="text-[var(--text-primary)] md:text-[18px] text-[16px] font-[500] md:leading-[22px] leading-[20px] truncate">Build X</span>
               </div>
             </div>
           </div>
@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="max-md:px-[16px] mx-auto w-full max-w-full sm:max-w-[768px] sm:min-w-[360px] mt-[20vh] mb-auto">
-        <div class="w-full flex pl-4 items-center justify-start pb-4">
+        <div class="w-full flex ps-4 items-center justify-start pb-4">
           <span class="text-[var(--text-primary)] text-start font-serif text-[32px] leading-[40px]">
             {{ $t('Hello') }}, {{ currentUser?.fullname }}
             <br />
@@ -96,7 +96,7 @@ const attachments = ref<FileInfo[]>([]);
 const { hideFilePreviewer } = useFilePreviewer();
 const { currentUser } = useAuth();
 const showGithubButton = ref(false);
-const githubRepositoryUrl = ref('https://github.com/simpleyyt/ai-manus');
+const githubRepositoryUrl = ref('https://github.com/MMUU6699/build-x');
 
 // Suggestion chips, structure replicated from the manus.im home page
 interface Suggestion {

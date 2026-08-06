@@ -1,22 +1,22 @@
-# AI Manus
+# Build X
 
-English | [中文](README_zh.md) | [Official Site](https://ai-manus.com) | [Documents](https://docs.ai-manus.com/#/en/)
+English | [ä¸­æ–‡](README_zh.md) | [Official Site](https://build-x.example) | [Documents](https://docs.build-x.example/#/en/)
 
-[![GitHub stars](https://img.shields.io/github/stars/simpleyyt/ai-manus?style=social)](https://github.com/simpleyyt/ai-manus/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/MMUU6699/build-x?style=social)](https://github.com/MMUU6699/build-x/stargazers)
 &ensp;
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-AI Manus is a general-purpose AI Agent system that supports running various tools and operations in a sandbox environment. Now with **Claw** — a deeply integrated [OpenClaw](https://github.com/anthropics/openclaw) AI assistant that brings one-click deployment, per-user isolated containers, and seamless chat history to the Manus ecosystem.
+Build X is a general-purpose AI Agent system that supports running various tools and operations in a sandbox environment. Now with **Claw** â€” a deeply integrated [OpenClaw](https://github.com/anthropics/openclaw) AI assistant that brings one-click deployment, per-user isolated containers, and seamless chat history to the Build X ecosystem.
 
-Enjoy your own agent with AI Manus!
+Enjoy your own agent with Build X!
 
-👏 Join [QQ Group(1005477581)](https://qun.qq.com/universal-share/share?ac=1&authKey=p4X3Da5iMpR4liAenxwvhs7IValPKiCFtUevRlJouz9qSTSZsMnPJc3hzsJjgQYv&busi_data=eyJncm91cENvZGUiOiIxMDA1NDc3NTgxIiwidG9rZW4iOiJNZmUrTmQ0UzNDZDNqNDFVdjVPS1VCRkJGRWVlV0R3RFJSRVFoZDAwRjFDeUdUM0t6aUIyczlVdzRjV1BYN09IIiwidWluIjoiMzQyMjExODE1In0%3D&data=C3B-E6BlEbailV32co77iXL5vxPIhtD9y_itWLSq50hKqosO_55_isOZym2Faaq4hs9-517tUY8GSWaDwPom-A&svctype=4&tempid=h5_group_info)
+ðŸ‘ Join [QQ Group(1005477581)](https://qun.qq.com/universal-share/share?ac=1&authKey=p4X3Da5iMpR4liAenxwvhs7IValPKiCFtUevRlJouz9qSTSZsMnPJc3hzsJjgQYv&busi_data=eyJncm91cENvZGUiOiIxMDA1NDc3NTgxIiwidG9rZW4iOiJNZmUrTmQ0UzNDZDNqNDFVdjVPS1VCRkJGRWVlV0R3RFJSRVFoZDAwRjFDeUdUM0t6aUIyczlVdzRjV1BYN09IIiwidWluIjoiMzQyMjExODE1In0%3D&data=C3B-E6BlEbailV32co77iXL5vxPIhtD9y_itWLSq50hKqosO_55_isOZym2Faaq4hs9-517tUY8GSWaDwPom-A&svctype=4&tempid=h5_group_info)
 
-❤️ Like AI Manus? Give it a star 🌟 or [Sponsor](docs/sponsor.md) to support the development!
+â¤ï¸ Like Build X? Give it a star ðŸŒŸ or [Sponsor](docs/sponsor.md) to support the development!
 
-🚀 [Try a Demo](https://app.ai-manus.com)
+ðŸš€ [Try a Demo](https://app.build-x.example)
 
-📝 [Blog: Rebuild Manus with WebUI and Sandbox](https://simpleyyt.com/2026/03/07/rebuild-manus-with-webui-and-sandbox/)
+ðŸ“ [Blog: Rebuild Build X with WebUI and Sandbox](https://simpleyyt.com/2026/03/07/rebuild-manus-with-webui-and-sandbox/) <!-- TODO: community link — مدونــة المطور الأصلي، تحتاج رابط مدونة Build X لاحقًا -->
 
 ## Demos
 
@@ -100,19 +100,19 @@ Docker Compose is recommended for deployment:
 ```yaml
 services:
   frontend:
-    image: simpleyyt/manus-frontend
+    image: your-dockerhub-username/build-x-frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
     environment:
       - BACKEND_URL=http://backend:8000
 
   backend:
-    image: simpleyyt/manus-backend
+    image: your-dockerhub-username/build-x-backend
     depends_on:
       - sandbox
       - claw
@@ -121,25 +121,25 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       #- ./mcp.json:/etc/mcp.json # Mount MCP servers directory
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       # All configuration is loaded from the .env file, see .env.example
-      # More configuration options: https://docs.ai-manus.com/#/configuration
+      # More configuration options: https://docs.build-x.example/#/configuration
       - .env
 
   sandbox:
-    image: simpleyyt/manus-sandbox
+    image: your-dockerhub-username/build-x-sandbox
     command: /bin/sh -c "exit 0"  # prevent sandbox from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
   claw:
-    image: simpleyyt/manus-claw
+    image: your-dockerhub-username/build-x-claw
     entrypoint: /bin/sh -c "exit 0"  # prevent claw from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
   mongodb:
     image: mongo:7.0
@@ -149,26 +149,26 @@ services:
     #ports:
     #  - "27017:27017"
     networks:
-      - manus-network
+      - build-x-network
 
   redis:
     image: redis:7.0
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
 volumes:
   mongodb_data:
-    name: manus-mongodb-data
+    name: build-x-mongodb-data
 
 networks:
-  manus-network:
-    name: manus-network
+  build-x-network:
+    name: build-x-network
     driver: bridge
 ```
 <!-- /docker-compose-example.yml -->
 
-Save as `docker-compose.yml` file. All configuration is loaded from a `.env` file, so create one next to it based on [.env.example](https://github.com/simpleyyt/ai-manus/blob/main/.env.example). At minimum set `API_KEY`:
+Save as `docker-compose.yml` file. All configuration is loaded from a `.env` file, so create one next to it based on [.env.example](https://github.com/MMUU6699/build-x/blob/main/.env.example). At minimum set `API_KEY`:
 
 ```ini
 API_KEY=sk-xxxx
@@ -184,7 +184,7 @@ docker compose up -d
 
 > Note: If you see `sandbox-1 exited with code 0`, this is normal, as it ensures the sandbox image is successfully pulled locally.
 
-Open your browser and visit <http://localhost:5173> to access Manus. For more configuration options, see: https://docs.ai-manus.com/#/en/configuration
+Open your browser and visit <http://localhost:5173> to access Build X. For more configuration options, see: https://docs.build-x.example/#/en/configuration
 
 ## Development Guide
 
@@ -192,18 +192,18 @@ Open your browser and visit <http://localhost:5173> to access Manus. For more co
 
 This project consists of the following sub-projects:
 
-* `frontend`: Manus frontend
-* `backend`: Manus backend
-* `sandbox`: Manus sandbox
-* `claw`: Manus Claw — OpenClaw plugin & container image bridging OpenClaw Gateway with Manus backend
+* `frontend`: Build X frontend
+* `backend`: Build X backend
+* `sandbox`: Build X sandbox
+* `claw`: Build X Claw â€” OpenClaw plugin & container image bridging OpenClaw Gateway with Build X backend
 * `mockserver`: Mock LLM server (for development/testing)
 
 ### Environment Setup
 
 1. Download the project:
 ```bash
-git clone https://github.com/simpleyyt/ai-manus.git
-cd ai-manus
+git clone https://github.com/MMUU6699/build-x.git
+cd build-x
 ```
 
 2. Copy the configuration file:
@@ -211,7 +211,7 @@ cd ai-manus
 cp .env.example .env
 ```
 
-3. Modify the configuration file. At minimum set `API_KEY`. See [.env.example](https://github.com/simpleyyt/ai-manus/blob/main/.env.example) or [Configuration](https://docs.ai-manus.com/#/en/configuration) for the full list of options:
+3. Modify the configuration file. At minimum set `API_KEY`. See [.env.example](https://github.com/MMUU6699/build-x/blob/main/.env.example) or [Configuration](https://docs.build-x.example/#/en/configuration) for the full list of options:
 
 ```ini
 API_KEY=sk-xxxx
@@ -263,6 +263,6 @@ export IMAGE_TAG=latest
 ./run.sh push
 ```
 
-## ⭐️ Star History
+## â­ï¸ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Simpleyyt/ai-manus&type=Date)](https://www.star-history.com/#Simpleyyt/ai-manus&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=MMUU6699/build-x&type=Date)](https://www.star-history.com/#MMUU6699/build-x&Date)

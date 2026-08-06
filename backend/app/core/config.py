@@ -38,21 +38,25 @@ class Settings(BaseSettings):
     # OpenAI / OpenAI-compatible endpoints).
     llm_provider: str = "langchain"
     
-    # MongoDB configuration
-    mongodb_uri: str = "mongodb://mongodb:27017"
-    mongodb_database: str = "manus"
-    mongodb_username: str | None = None
-    mongodb_password: str | None = None
+    # PostgreSQL configuration (Supabase Postgres-compatible)
+    database_url: str = "postgresql+asyncpg://build_x:build_x@db:5432/build_x"
+
+    # Supabase configuration
+    supabase_url: str | None = None
+    supabase_anon_key: str | None = None
+    supabase_service_key: str | None = None
+    supabase_jwt_secret: str | None = None  # JWT secret for local token verification
+    supabase_storage_bucket: str = "files"
     
-    # Redis configuration
-    redis_host: str = "redis"
-    redis_port: int = 6379
-    redis_db: int = 0
-    redis_password: str | None = None
+    # Frontend & CORS configuration
+    frontend_url: str = "http://localhost:5173"
+
+    # Daytona configuration
+    daytona_api_key: str | None = None
     
     # Sandbox configuration
     sandbox_address: str | None = None
-    sandbox_image: str | None = None
+    sandbox_image: str = "ghcr.io/mmuu6699/build-x-sandbox:latest"
     sandbox_name_prefix: str | None = None
     sandbox_ttl_minutes: int | None = 30
     sandbox_network: str | None = None  # Docker network bridge name
@@ -92,7 +96,7 @@ class Settings(BaseSettings):
     # Auth configuration
     auth_provider: str = "password"  # "password", "none", "local"
     show_github_button: bool = True
-    github_repository_url: str = "https://github.com/simpleyyt/ai-manus"
+    github_repository_url: str = "https://github.com/MMUU6699/build-x"
     password_salt: str | None = None
     password_hash_rounds: int = 10
     password_hash_algorithm: str = "pbkdf2_sha256"
@@ -112,7 +116,7 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
 
-    # Opaque Redis auth sessions (browser Cookie + App Bearer)
+    # Opaque auth sessions (browser Cookie + App Bearer), stored in Postgres
     session_cookie_name: str = "session_id"
     session_web_ttl_days: int = 14
     session_app_ttl_days: int = 30
@@ -126,21 +130,21 @@ class Settings(BaseSettings):
     
     # Claw (OpenClaw) configuration
     claw_enabled: bool = False
-    claw_image: str = "simpleyyt/manus-claw"
-    claw_name_prefix: str = "manus-claw"
+    claw_image: str = "ghcr.io/mmuu6699/build-x-claw:latest"
+    claw_name_prefix: str = "build-x-claw"
     claw_ttl_seconds: int = 3600
     claw_network: str | None = None  # Docker network bridge name for claw containers
     claw_ready_timeout: int = 300  # Max seconds to wait for claw container to become ready
     claw_address: str | None = None  # If set, use this fixed host instead of creating Docker containers
     claw_api_key: str | None = None  # Static API key accepted by the LLM proxy (for dev/fixed container)
-    manus_api_base_url: str = "http://backend:8000"  # URL of this backend accessible from claw containers
+    build_x_api_base_url: str = "http://backend:8000"  # URL of this backend accessible from claw containers
 
     # Task backend configuration: "local" (in-process asyncio, default)
     # or "celery" (distributed Celery workers; requires running `app.worker`)
     task_backend: str = "local"
     # Optional custom Celery broker URL, only used when TASK_BACKEND=celery.
-    # Defaults to the Redis settings above when unset.
-    # e.g. "redis://:password@redis:6379/0" or "amqp://user:pass@rabbitmq:5672//"
+    # Defaults to a Postgres-backed (SQLAlchemy transport) URL derived from
+    # DATABASE_URL when unset. e.g. "db+postgresql://build_x:build_x@db:5432/build_x"
     celery_broker_url: str | None = None
 
     # MCP configuration
@@ -150,7 +154,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     
     class Config:
-        env_file = ".env"
+        env_file = (".env", "../.env")
         env_file_encoding = "utf-8"
         
     def validate(self):
@@ -161,9 +165,9 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     """Get application settings"""
-    if not os.environ.get("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = os.getenv("API_KEY")
     settings = Settings()
+    if not os.environ.get("OPENAI_API_KEY") and settings.api_key:
+        os.environ["OPENAI_API_KEY"] = settings.api_key
     settings.extra_headers = _parse_extra_headers()
     settings.validate()
     return settings 

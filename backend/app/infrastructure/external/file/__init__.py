@@ -1,5 +1,3 @@
-"""文件存储基础设施模块"""
+from .supabase_storage import SupabaseFileStorage, get_file_storage
 
-from .gridfsfile import GridFSFileStorage
-
-__all__ = ["GridFSFileStorage"] 
+__all__ = ["SupabaseFileStorage", "get_file_storage"]

@@ -1,5 +1,9 @@
 <template>
   <AuthFormLayout @submit="handleSubmit">
+    <template v-if="showOAuth">
+      <OAuthButtons />
+    </template>
+
     <FormField id="fullname" :label="t('Full Name')" v-model="formData.fullname" :error="validationErrors.fullname"
       :placeholder="t('Enter your full name')" :disabled="isLoading"
       @update:model-value="validateField('fullname')" @blur="validateField('fullname')" />
@@ -27,17 +31,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/api'
 import { validateUserInput } from '@/utils/auth'
 import { showErrorToast, showSuccessToast } from '@/utils/toast'
+import { getCachedAuthProvider, getCachedClientConfig } from '@/api/config'
 import { useFormValidation } from '@/composables/useFormValidation'
 import AuthFormLayout from './AuthFormLayout.vue'
 import FormField from './FormField.vue'
 import PasswordField from './PasswordField.vue'
 import SubmitButton from './SubmitButton.vue'
 import FormFooterLink from './FormFooterLink.vue'
+import OAuthButtons from './OAuthButtons.vue'
 
 const { t } = useI18n()
 
@@ -47,6 +53,15 @@ const emits = defineEmits<{
 }>()
 
 const { register, isLoading, authError } = useAuth()
+
+const showOAuth = ref(false)
+
+onMounted(async () => {
+  const authProvider = await getCachedAuthProvider()
+  const clientConfig = await getCachedClientConfig()
+  showOAuth.value = !!(clientConfig && authProvider !== 'none'
+    && clientConfig.supabase_url && clientConfig.supabase_anon_key)
+})
 
 const formData = ref({
   fullname: '',
@@ -93,7 +108,7 @@ const handleSubmit = async () => {
       password: formData.value.password
     })
 
-    showSuccessToast(t('Registration successful! Welcome to Manus'))
+    showSuccessToast(t('Registration successful! Welcome to Build X'))
     emits('success')
   } catch (error) {
     console.error('Registration failed:', error)

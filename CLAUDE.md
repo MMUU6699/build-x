@@ -6,14 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-AI Manus is a general-purpose AI Agent system. A user message drives a **plan-and-execute agent loop** in the backend, which runs tools (shell, browser, file, search, MCP) inside a **per-session Docker sandbox** and streams every event back to the browser over **WebSocket**. The repo is a monorepo of five cooperating services:
+Build X is a general-purpose AI Agent system. A user message drives a **plan-and-execute agent loop** in the backend, which runs tools (shell, browser, file, search, MCP) inside a **per-session Docker sandbox** and streams every event back to the browser over **WebSocket**. The repo is a monorepo of five cooperating services:
 
 | Service | Stack | Dev Port | Entry Point |
 |---|---|---|---|
 | `frontend` | Vue 3 + TS, Vite, Tailwind, reka-ui | 5173 | `frontend/src/main.ts` |
 | `backend` | Python 3.12, FastAPI, LangChain, Beanie/Motor | 8000 (debugpy 5678) | `backend/app/main.py` |
 | `sandbox` | Python 3.10, FastAPI + Xvfb/Chrome/VNC under supervisord | 8080 API, 5900 VNC, 9222 CDP | `sandbox/app/main.py` |
-| `claw` | Node.js, OpenClaw Gateway + `manus-claw` plugin | 18788 | `claw/entrypoint.sh` |
+| `claw` | Node.js, OpenClaw Gateway + `build-x-claw` plugin | 18788 | `claw/entrypoint.sh` |
 | `mockserver` | Python, FastAPI (canned LLM responses) | 8090 | `mockserver/main.py` |
 
 Backing services: MongoDB 7.0 (sessions, agents, users) and Redis 7.0 (cache + message queues). The backend talks to `/var/run/docker.sock` to spawn sandbox and Claw containers.
@@ -85,7 +85,7 @@ Each toolkit in `domain/services/tools/` (shell, browser, file, search, message,
 ## Sandbox & Claw
 
 - **Sandbox** (`sandbox/app/`) is a thin FastAPI service (`api/v1/{shell,file,supervisor}.py`) running inside an Ubuntu container managed by supervisord (Chrome, Xvfb, x11vnc, websockify, the API). One sandbox is spawned per session in production.
-- **Claw** (`claw/`) bridges [OpenClaw](https://github.com/anthropics/openclaw) into Manus via the `manus-claw` plugin, giving per-user isolated containers. Backend integration is under `application/services/claw_service.py` + `infrastructure/external/claw/`. Debug help in `.cursor/skills/debug-claw/SKILL.md`.
+- **Claw** (`claw/`) bridges [OpenClaw](https://github.com/anthropics/openclaw) into Build X via the `build-x-claw` plugin, giving per-user isolated containers. Backend integration is under `application/services/claw_service.py` + `infrastructure/external/claw/`. Debug help in `.cursor/skills/debug-claw/SKILL.md`.
 
 ## Frontend notes
 

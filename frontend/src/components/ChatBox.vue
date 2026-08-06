@@ -1,6 +1,6 @@
 <template>
     <div class="pb-3 relative bg-[var(--background-gray-main)]">
-        <!-- 结构照抄 manus.im 会话输入框：圆角卡片 + 底栏 + / 附件 / 麦 / 发送 -->
+        <!-- ç»“æž„ç…§æŠ„ manus.im ä¼šè¯è¾“å…¥æ¡†ï¼šåœ†è§’å¡ç‰‡ + åº•æ  + / é™„ä»¶ / éº¦ / å‘é€ -->
         <div
             class="flex flex-col gap-2 rounded-[22px] transition-all relative bg-[var(--background-menu-white)] pt-3 pb-2.5 max-h-[300px] shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02)] border border-black/8 dark:border-[var(--border-main)] focus-within:border-black/20 dark:focus-within:border-[var(--border-dark)]">
             <ChatBoxFiles ref="chatBoxFileListRef" :attachments="attachments"
@@ -23,7 +23,7 @@
                         <Plus :size="18" />
                     </button>
                     <div v-if="showPlusMenu"
-                        class="absolute bottom-[calc(100%+8px)] left-0 z-50 min-w-[200px] rounded-[12px] border border-[var(--border-light)] bg-[var(--background-menu-white)] shadow-[0px_8px_32px_0px_var(--shadow-S)] py-1">
+                        class="absolute bottom-[calc(100%+8px)] start-0 z-50 min-w-[200px] rounded-[12px] border border-[var(--border-light)] bg-[var(--background-menu-white)] shadow-[0px_8px_32px_0px_var(--shadow-S)] py-1">
                         <button type="button"
                             class="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--fill-tsp-white-main)]"
                             @click="handleAddLocalFiles">
@@ -37,7 +37,7 @@
                     :title="t('Add local files')">
                     <Paperclip :size="18" />
                 </button>
-                <div class="flex gap-1.5 ml-auto items-center">
+                <div class="flex gap-1.5 ms-auto items-center">
                     <button v-if="!isRunning || sendEnabled || hideStopButton"
                         class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors text-sm rounded-full p-0 w-8 h-8 min-w-0 hover:opacity-90"
                         :class="!sendEnabled ? 'cursor-not-allowed bg-[var(--fill-tsp-white-dark)] hover:opacity-100' : 'cursor-pointer bg-[var(--Button-primary-black)]'"
@@ -77,13 +77,13 @@ const props = withDefaults(defineProps<{
     attachments: FileInfo[];
     hideStopButton?: boolean;
     allowSendFilesOnly?: boolean;
-    /** Manus session detail uses "Send message to Manus"; home keeps the task prompt. */
+    /** Build X session detail uses "Send message to Build X"; home keeps the task prompt. */
     placeholder?: string;
 }>(), {
     placeholder: undefined,
 });
 
-const placeholderText = computed(() => props.placeholder || t('Give Manus a task to work on...'));
+const placeholderText = computed(() => props.placeholder || t('Give Build X a task to work on...'));
 
 const sendEnabled = computed(() => {
     const hasFiles = (props.attachments?.length ?? 0) > 0;

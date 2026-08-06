@@ -18,7 +18,7 @@ services:
       - backend
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
   backend:
     build:
@@ -47,22 +47,19 @@ services:
       claw:
         condition: service_started
         required: false
-      mongodb:
-        condition: service_started
-        required: true
-      redis:
+      db:
         condition: service_started
         required: true
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       - .env
     environment:
       - SANDBOX_ADDRESS=sandbox # Use single container as sandbox
       - CLAW_ADDRESS=claw       # Use single fixed claw container in development
-      - MANUS_API_BASE_URL=http://backend:8000
-      - CLAW_API_KEY=${CLAW_DEV_API_KEY:-manus-dev-api-key-changeme}
+      - BUILD_X_API_BASE_URL=http://backend:8000
+      - CLAW_API_KEY=${CLAW_DEV_API_KEY:-build-x-dev-api-key-changeme}
 
   sandbox:
     build:
@@ -84,7 +81,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
   claw:
     build:
@@ -92,14 +89,14 @@ services:
       dockerfile: Dockerfile
     hostname: claw
     ports:
-      - "18788:18788" # manus-claw HTTP server
+      - "18788:18788" # build-x-claw HTTP server
     environment:
       - CLAW_TTL_SECONDS=0        # No TTL in development (0 = unlimited)
-      - MANUS_API_BASE_URL=http://backend:8000
-      - MANUS_API_KEY=${CLAW_DEV_API_KEY:-manus-dev-api-key-changeme}
+      - BUILD_X_API_BASE_URL=http://backend:8000
+      - BUILD_X_API_KEY=${CLAW_DEV_API_KEY:-build-x-dev-api-key-changeme}
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
   mockserver:
     build:
@@ -114,29 +111,27 @@ services:
       - MOCK_DATA_FILE=default.yaml
       - MOCK_DELAY=1
     networks:
-      - manus-network
+      - build-x-network
 
-  mongodb:
-    image: mongo:7.0
-    volumes:
-      - mongodb_data:/data/db
-    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=build_x
+      - POSTGRES_PASSWORD=build_x
+      - POSTGRES_DB=build_x
     ports:
-      - "27017:27017"
-    networks:
-      - manus-network
-
-  redis:
-    image: redis:7.0
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
 volumes:
-  mongodb_data:
-    name: manus-mongodb-data
+  postgres_data:
+    name: build-x-postgres-data
 
 networks:
-  manus-network:
-    name: manus-network
+  build-x-network:
+    name: build-x-network
     driver: bridge

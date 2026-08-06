@@ -135,12 +135,30 @@ export interface ResetPasswordRequest {
 
 
 /**
+ * OAuth login request type — Supabase access token from the PKCE flow.
+ */
+export interface OAuthSessionRequest {
+  access_token: string;
+  client?: string;
+}
+
+/**
  * User login
  * @param request Login credentials
  * @returns Login response with user info and tokens
  */
 export async function login(request: LoginRequest): Promise<LoginResponse> {
   const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', request);
+  return response.data.data;
+}
+
+/**
+ * OAuth login — exchange a Supabase-verified access token for a local session.
+ * @param request Supabase access token obtained via the OAuth PKCE flow
+ * @returns Login response with user info and tokens
+ */
+export async function oauthLogin(request: OAuthSessionRequest): Promise<LoginResponse> {
+  const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/oauth/session', request);
   return response.data.data;
 }
 

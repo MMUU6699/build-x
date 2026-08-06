@@ -20,6 +20,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    allowedHosts: ['.trycloudflare.com', '.ngrok.io', '.ngrok-free.app', '.localtest.me'],
     ...(process.env.BACKEND_URL && {
       proxy: {
         '/api': {

@@ -1,3 +1,3 @@
-from app.infrastructure.external.session_auth.redis_session_store import RedisSessionStore
+from app.infrastructure.external.session_auth.postgres_session_store import PostgresSessionStore
 
-__all__ = ["RedisSessionStore"]
+__all__ = ["PostgresSessionStore"]

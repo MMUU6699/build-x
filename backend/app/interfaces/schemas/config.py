@@ -8,3 +8,5 @@ class ClientConfigResponse(BaseModel):
     github_repository_url: str
     google_analytics_id: str | None = None
     claw_enabled: bool
+    supabase_url: str | None = None
+    supabase_anon_key: str | None = None

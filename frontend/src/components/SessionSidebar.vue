@@ -85,14 +85,14 @@
         <div
           v-if="clawEnabled"
           @click="handleClawClick"
-          :title="isSessionSidebarShow ? undefined : 'Manus Claw'"
+          :title="isSessionSidebarShow ? undefined : 'Build X Claw'"
           class="flex items-center rounded-[10px] clickable cursor-pointer transition-colors w-full gap-[8px] h-[36px] pointer-events-auto ps-[8px] pe-[2px]"
           :class="route.path === '/chat/claw' ? 'bg-[var(--fill-tsp-white-main)]' : 'hover:bg-[var(--fill-tsp-white-light)]'">
           <div class="shrink-0 size-[20px] flex items-center justify-center">
             <div class="claw-nav-icon w-[18px] h-[18px]" />
           </div>
           <div v-if="isSessionSidebarShow" class="flex-1 min-w-0 flex gap-[4px] items-center text-[14px] text-[var(--text-primary)]">
-            <span class="truncate">Manus Claw</span>
+            <span class="truncate">Build X Claw</span>
           </div>
         </div>
 

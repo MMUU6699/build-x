@@ -66,7 +66,7 @@ class FakeClawRuntime:
     async def create(self, claw_id: str, api_key: str) -> ClawInstanceInfo:
         if self.fail_create:
             raise RuntimeError("boom")
-        return ClawInstanceInfo(address="10.0.0.5", instance_name=f"manus-claw-{claw_id[:8]}")
+        return ClawInstanceInfo(address="10.0.0.5", instance_name=f"build-x-claw-{claw_id[:8]}")
 
     async def destroy(self, instance_name: Optional[str]) -> None:
         self.destroyed.append(instance_name)
@@ -90,9 +90,9 @@ def _make_claw(**overrides) -> Claw:
     defaults = dict(
         id="claw-1234-abcd",
         user_id="user-1",
-        api_key="manus-testkey",
+        api_key="build-x-testkey",
         status=ClawStatus.RUNNING,
-        container_name="manus-claw-claw1234",
+        container_name="build-x-claw-claw1234",
         container_ip="10.0.0.5",
     )
     defaults.update(overrides)
@@ -108,7 +108,7 @@ async def test_expired_claw_destroys_container():
     result = await service.get_claw("user-1")
 
     assert result is None
-    assert runtime.destroyed == ["manus-claw-claw1234"]
+    assert runtime.destroyed == ["build-x-claw-claw1234"]
     assert repo.deleted_user_ids == ["user-1"]
 
 
@@ -121,7 +121,7 @@ async def test_delete_claw_destroys_container():
     deleted = await service.delete_claw("user-1")
 
     assert deleted is True
-    assert runtime.destroyed == ["manus-claw-claw1234"]
+    assert runtime.destroyed == ["build-x-claw-claw1234"]
     assert repo.deleted_user_ids == ["user-1"]
 
 
@@ -145,7 +145,7 @@ async def test_provision_failure_destroys_container():
     await service.provision_claw_instance(claw, ttl_seconds=3600)
 
     assert claw.status == ClawStatus.ERROR
-    assert runtime.destroyed == ["manus-claw-claw-123"]
+    assert runtime.destroyed == ["build-x-claw-claw-123"]
     assert claw.container_name is None
     assert claw.container_ip is None
 

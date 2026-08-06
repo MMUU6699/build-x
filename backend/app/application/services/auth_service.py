@@ -15,6 +15,10 @@ from app.application.errors.exceptions import UnauthorizedError, ValidationError
 from app.core.config import get_settings
 from app.application.services.token_service import TokenService
 from app.domain.models.auth import AuthToken
+from app.infrastructure.external.supabase.supabase_auth_client import (
+    SupabaseAuthClient,
+    SupabaseAuthNotConfiguredError,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +37,7 @@ class AuthService:
         self.settings = get_settings()
         self.token_service = token_service
         self.session_store = session_store
+        self.supabase = SupabaseAuthClient()
 
     def _hash_password(self, password: str) -> str:
         salt = self.settings.password_salt or ''
@@ -100,7 +105,7 @@ class AuthService:
         return session
 
     async def _user_from_id(self, user_id: str) -> Optional[User]:
-        if self.settings.auth_provider == "password":
+        if self.settings.auth_provider in ("password", "supabase"):
             user = await self.user_repository.get_user_by_id(user_id)
             if not user or not user.is_active:
                 return None
@@ -170,7 +175,7 @@ class AuthService:
 
     async def user_from_resolved(self, resolved: ResolvedCredentials) -> Optional[User]:
         if resolved.source == CredentialSource.JWT_GRACE and resolved.jwt_payload:
-            if self.settings.auth_provider == "password":
+            if self.settings.auth_provider in ("password", "supabase"):
                 return await self._user_from_id(resolved.user_id)
             return User(
                 id=resolved.jwt_payload.get("sub"),
@@ -198,16 +203,27 @@ class AuthService:
         if await self.user_repository.email_exists(email):
             raise ValidationError("Email already exists")
 
-        password_hash = self._hash_password(password)
+        try:
+            supabase_user = await self.supabase.sign_up(
+                email=email.lower(), password=password, fullname=fullname.strip()
+            )
+        except SupabaseAuthNotConfiguredError as e:
+            raise BadRequestError(str(e))
+        except RuntimeError as e:
+            message = str(e).lower()
+            if "already registered" in message or "already" in message and "exist" in message:
+                raise ValidationError("Email already exists")
+            raise ValidationError(f"Registration failed: {e}")
+
         user = User(
-            id=self._generate_user_id(),
+            id=supabase_user.id,
             fullname=fullname.strip(),
             email=email.lower(),
-            password_hash=password_hash,
+            password_hash=None,
             role=role,
             is_active=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
         created_user = await self.user_repository.create_user(user)
         logger.info(f"User registered successfully: {created_user.id}")
@@ -241,18 +257,28 @@ class AuthService:
             return None
 
         if self.settings.auth_provider == "password":
+            try:
+                sign_in_result = await self.supabase.sign_in(email=email, password=password)
+            except SupabaseAuthNotConfiguredError as e:
+                logger.error(f"Supabase Auth not configured: {e}")
+                return None
+            except RuntimeError as e:
+                logger.warning(f"Authentication failed for user {email}: {e}")
+                return None
             user = await self.user_repository.get_user_by_email(email)
             if not user:
-                logger.warning(f"User not found: {email}")
-                return None
+                # Valid Supabase credentials but no profile row yet: create one.
+                user = User(
+                    id=sign_in_result.user.id,
+                    fullname=sign_in_result.user.fullname or email.split("@")[0],
+                    email=email.lower(),
+                    role=UserRole.USER,
+                    is_active=True,
+                )
+                user = await self.user_repository.create_user(user)
+                return user
             if not user.is_active:
                 logger.warning(f"User account is inactive: {email}")
-                return None
-            if not user.password_hash:
-                logger.warning(f"User has no password hash: {email}")
-                return None
-            if not self._verify_password(password, user.password_hash):
-                logger.warning(f"Invalid password for user: {email}")
                 return None
             user.update_last_login()
             await self.user_repository.update_user(user)
@@ -284,8 +310,65 @@ class AuthService:
         )
 
     async def login_with_tokens(self, email: str, password: str) -> AuthToken:
-        """Backward-compatible alias — issues Redis sessions, not JWTs."""
+        """Backward-compatible alias — issues Postgres auth sessions, not JWTs."""
         return await self.login_with_session(email, password, client=AuthClientType.WEB)
+
+    async def login_with_supabase_token(
+        self,
+        access_token: str,
+        client: AuthClientType = AuthClientType.WEB,
+        ip: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> AuthToken:
+        """Log in a user whose identity was verified by Supabase Auth (OAuth).
+
+        The frontend exchanges the OAuth PKCE code for a Supabase access
+        token, then hands it to us. We validate it against Supabase, find or
+        create the local profile, and mint an opaque auth session.
+        """
+        if self.settings.auth_provider == "none":
+            raise BadRequestError("Authentication is not available")
+
+        try:
+            supabase_user = await self.supabase.get_user(access_token)
+        except SupabaseAuthNotConfiguredError as e:
+            raise BadRequestError(str(e))
+        except RuntimeError as e:
+            logger.warning(f"Supabase token rejected: {e}")
+            raise UnauthorizedError("Invalid Supabase session")
+
+        if not supabase_user.id:
+            raise UnauthorizedError("Invalid Supabase session")
+
+        user = await self.user_repository.get_user_by_id(supabase_user.id)
+        if not user:
+            user = User(
+                id=supabase_user.id,
+                fullname=supabase_user.fullname
+                or (supabase_user.email or "user").split("@")[0],
+                email=supabase_user.email or "",
+                role=UserRole.USER,
+                is_active=True,
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            user = await self.user_repository.create_user(user)
+            logger.info(f"User created from Supabase OAuth login: {user.id}")
+        elif not user.is_active:
+            raise UnauthorizedError("User account is inactive")
+        else:
+            user.update_last_login()
+            await self.user_repository.update_user(user)
+
+        session = await self.create_auth_session(
+            user, client=client, ip=ip, user_agent=user_agent
+        )
+        return AuthToken(
+            access_token=session.session_id,
+            refresh_token=session.session_id,
+            token_type="bearer",
+            user=user,
+        )
 
     async def refresh_access_token(
         self,
@@ -383,15 +466,26 @@ class AuthService:
             raise ValidationError("User not found")
         if not user.is_active:
             raise UnauthorizedError("User account is inactive")
-        if not user.password_hash or not self._verify_password(old_password, user.password_hash):
-            raise UnauthorizedError("Invalid old password")
         if not new_password or len(new_password) < 6:
             raise ValidationError("New password must be at least 6 characters long")
-        user.password_hash = self._hash_password(new_password)
-        user.updated_at = datetime.utcnow()
-        await self.user_repository.update_user(user)
-        logger.info(f"Password changed successfully for user: {user_id}")
-        return True
+        if self.settings.auth_provider == "password":
+            try:
+                await self.supabase.sign_in(email=user.email, password=old_password)
+            except SupabaseAuthNotConfiguredError as e:
+                raise BadRequestError(str(e))
+            except RuntimeError:
+                raise UnauthorizedError("Invalid old password")
+            try:
+                await self.supabase.admin_update_user_password(user_id, new_password)
+            except SupabaseAuthNotConfiguredError as e:
+                raise BadRequestError(str(e))
+            except RuntimeError as e:
+                raise ValidationError(f"Failed to update password: {e}")
+            user.updated_at = datetime.utcnow()
+            await self.user_repository.update_user(user)
+            logger.info(f"Password changed successfully for user: {user_id}")
+            return True
+        raise BadRequestError("Password change is not available")
 
     async def change_fullname(self, user_id: str, new_fullname: str) -> User:
         logger.info(f"Changing fullname for user: {user_id}")
@@ -442,7 +536,12 @@ class AuthService:
             raise UnauthorizedError("User account is inactive")
         if not new_password or len(new_password) < 6:
             raise ValidationError("New password must be at least 6 characters long")
-        user.password_hash = self._hash_password(new_password)
+        try:
+            await self.supabase.admin_update_user_password(user.id, new_password)
+        except SupabaseAuthNotConfiguredError as e:
+            raise BadRequestError(str(e))
+        except RuntimeError as e:
+            raise ValidationError(f"Failed to reset password: {e}")
         user.updated_at = datetime.utcnow()
         await self.user_repository.update_user(user)
         logger.info(f"Password reset successfully for user: {email}")

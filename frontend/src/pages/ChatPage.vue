@@ -2,20 +2,20 @@
   <SimpleBar ref="simpleBarRef" @scroll="handleScroll">
     <!-- Chat column: full-bleed header (Manus) + centered message column -->
     <div ref="chatContainerRef" class="relative flex flex-col h-full flex-1 min-w-0">
-      <!-- Official session chrome header bar (CDP: manus.im/app/…) -->
+      <!-- Official session chrome header bar (CDP: manus.im/app/â€¦) -->
       <div ref="observerRef"
         class="flex h-[56px] w-full shrink-0 items-center justify-between py-[12px] md:px-[24px] ps-[16px] pe-[20px] md:ps-[16px] md:pe-[20px] gap-1 border-b sticky top-0 z-10 flex-shrink-0 [-webkit-app-region:drag] bg-[var(--background-gray-main)] border-[var(--border-main)]">
         <div class="flex min-w-0 flex-1 items-center gap-1">
           <div class="flex items-center pointer-events-auto overflow-hidden">
-            <div class="flex h-8 pt-[7px] md:pr-[6px] pr-[4px] pb-[7px] md:pl-[8px] pl-[6px] justify-center items-center gap-1 rounded-[8px]">
-              <span class="text-[var(--text-primary)] md:text-[18px] text-[16px] font-[500] md:leading-[22px] leading-[20px] truncate">Manus</span>
+            <div class="flex h-8 pt-[7px] md:pe-[6px] pe-[4px] pb-[7px] md:ps-[8px] ps-[6px] justify-center items-center gap-1 rounded-[8px]">
+              <span class="text-[var(--text-primary)] md:text-[18px] text-[16px] font-[500] md:leading-[22px] leading-[20px] truncate">Build X</span>
             </div>
           </div>
           <div class="flex-1 min-w-[16px]"></div>
         </div>
 
         <div class="flex flex-shrink-0 items-center gap-1 pointer-events-auto">
-          <!-- Share — Manus SharePermission layout -->
+          <!-- Share â€” Manus SharePermission layout -->
           <Popover>
             <PopoverTrigger>
               <button type="button"
@@ -29,7 +29,7 @@
               <div class="w-[400px] max-w-[calc(100vw-16px)] flex flex-col bg-[var(--background-menu-white)] rounded-2xl shadow-[0px_8px_32px_0px_var(--shadow-S),0px_0px_0px_1px_var(--border-light)]">
                 <div class="flex py-3 px-4 justify-between items-center border-b border-[var(--border-main)]">
                   <h3 class="text-[var(--text-primary)] text-base font-medium leading-[22px]">{{ t('Share') }}</h3>
-                  <span class="inline-flex ml-auto cursor-help" :title="t('Share privacy tip')">
+                  <span class="inline-flex ms-auto cursor-help" :title="t('Share privacy tip')">
                     <CircleHelp :size="16" class="text-[var(--icon-tertiary)]" />
                   </span>
                 </div>
@@ -44,7 +44,7 @@
                       <div class="text-[var(--text-primary)] text-sm font-medium">{{ t('Only me') }}</div>
                       <div class="text-[var(--text-tertiary)] text-[13px]">{{ t('Viewable by yourself only') }}</div>
                     </div>
-                    <Check :size="20" :class="shareMode === 'private' ? 'ml-auto' : 'ml-auto invisible'" color="var(--icon-primary)" />
+                    <Check :size="20" :class="shareMode === 'private' ? 'ms-auto' : 'ms-auto invisible'" color="var(--icon-primary)" />
                   </div>
                   <div @click="handleShareModeChange('public')"
                     :class="{'pointer-events-none opacity-50': sharingLoading}"
@@ -56,7 +56,7 @@
                       <div class="text-[var(--text-primary)] text-sm font-medium">{{ t('Public access') }}</div>
                       <div class="text-[var(--text-tertiary)] text-[13px]">{{ t('Anyone with a link can view') }}</div>
                     </div>
-                    <Check :size="20" :class="shareMode === 'public' ? 'ml-auto' : 'ml-auto invisible'" color="var(--icon-primary)" />
+                    <Check :size="20" :class="shareMode === 'public' ? 'ms-auto' : 'ms-auto invisible'" color="var(--icon-primary)" />
                   </div>
 
                   <div v-if="shareMode === 'private'" class="mt-2">
@@ -72,7 +72,7 @@
                     <div class="flex items-center justify-between gap-2">
                       <div class="flex items-center gap-2">
                         <button type="button" class="size-9 rounded-full bg-[var(--fill-tsp-white-dark)] flex items-center justify-center hover:opacity-80" title="X" @click="shareToSocial('x')">
-                          <span class="text-sm font-bold text-[var(--text-primary)]">𝕏</span>
+                          <span class="text-sm font-bold text-[var(--text-primary)]">ð•</span>
                         </button>
                         <button type="button" class="size-9 rounded-full bg-[var(--fill-tsp-white-dark)] flex items-center justify-center hover:opacity-80 text-[12px] font-semibold text-[var(--text-primary)]" @click="shareToSocial('linkedin')">in</button>
                         <button type="button" class="size-9 rounded-full bg-[var(--fill-tsp-white-dark)] flex items-center justify-center hover:opacity-80 text-[13px] font-semibold text-[var(--text-primary)]" @click="shareToSocial('facebook')">f</button>
@@ -130,7 +130,7 @@
             :visible="showTaskCompleted"
             :copy-text="lastAssistantPlainText" />
           <!-- AgentIsTyping: only fill the empty gap before first visible turn output -->
-          <LoadingIndicator v-if="showThinking" :text="$t('{name} is thinking', { name: 'Manus' })" />
+          <LoadingIndicator v-if="showThinking" :text="$t('{name} is thinking', { name: 'Build X' })" />
           <!-- Official running spacer when work is already visible (tools/steps/messages) -->
           <div v-else-if="isLoading" aria-hidden="true" class="h-5 invisible" />
         </div>
@@ -259,7 +259,7 @@ const toolHistory = computed(() => {
   return tools;
 });
 
-const chatPlaceholder = computed(() => t('Send message to Manus'));
+const chatPlaceholder = computed(() => t('Send message to Build X'));
 
 const lastAssistantIndex = computed(() => {
   for (let i = messages.value.length - 1; i >= 0; i--) {
@@ -274,7 +274,7 @@ const lastAssistantPlainText = computed(() => {
   return ((messages.value[i].content as MessageContent).content || '').trim();
 });
 
-/** Official waiting row: "{product} will continue after your reply" (message_ask_user → WaitEvent) */
+/** Official waiting row: "{product} will continue after your reply" (message_ask_user â†’ WaitEvent) */
 const showWaitingContinue = computed(() =>
   sessionStatus.value === SessionStatus.WAITING && !isLoading.value,
 );
@@ -287,7 +287,7 @@ const showTaskCompleted = computed(() =>
 /**
  * Official AgentIsTyping: show only while waiting for the first visible output
  * of the current turn. Once assistant text / tool / step appears, the content
- * itself is the status — keep "thinking" would contradict "doing".
+ * itself is the status â€” keep "thinking" would contradict "doing".
  */
 const showThinking = computed(() => {
   if (!isLoading.value) return false;
@@ -312,7 +312,7 @@ const showThinking = computed(() => {
     if (m.type === 'assistant') {
       const text = ((m.content as MessageContent).content || '').trim();
       if (text) return false;
-      // Empty assistant bubble → still typing (official)
+      // Empty assistant bubble â†’ still typing (official)
     }
   }
   return true;
@@ -562,7 +562,7 @@ const restoreSession = async () => {
   realTime.value = true;
 
   // Always join the chat channel (status_update + idle Mongo catch-up).
-  // Only resume the live Redis stream while the agent is running — idle join
+  // Only resume the live Redis stream while the agent is running â€” idle join
   // no longer emits stream_end, so this will not stick isLoading.
   if (cancelCurrentChat.value) {
     cancelCurrentChat.value();
@@ -802,7 +802,7 @@ const shareToSocial = async (network: 'x' | 'linkedin' | 'facebook' | 'reddit') 
     }
   }
   const url = encodeURIComponent(getShareUrl());
-  const text = encodeURIComponent(title.value || 'Manus');
+  const text = encodeURIComponent(title.value || 'Build X');
   const targets: Record<string, string> = {
     x: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
@@ -817,8 +817,8 @@ const handleMoreClick = async (event: MouseEvent | KeyboardEvent) => {
   const target = (moreBtnRef.value || event.currentTarget) as HTMLElement;
   if (!sessionId.value) return;
 
-  // Official session-detail … menu: Rename / Move to project / — / Pin / Favorite / Delete
-  // (skip scheduled / archive — no local product support)
+  // Official session-detail â€¦ menu: Rename / Move to project / â€” / Pin / Favorite / Delete
+  // (skip scheduled / archive â€” no local product support)
   try {
     const res = await getProjects();
     projects.value = res.projects ?? [];
@@ -832,7 +832,7 @@ const handleMoreClick = async (event: MouseEvent | KeyboardEvent) => {
     createMenuItem('rename', t('Rename'), { icon: Pencil }),
   ];
 
-  // Official:「移动到项目」+ chevron → submenu (新项目 / — / projects)
+  // Official:ã€Œç§»åŠ¨åˆ°é¡¹ç›®ã€+ chevron â†’ submenu (æ–°é¡¹ç›® / â€” / projects)
   const moveChildren = [
     createMenuItem('new_project', t('New project'), { icon: FolderPlus }),
     createSeparator(),

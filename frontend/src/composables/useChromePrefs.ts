@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue'
 
-const NOTIFICATION_KEY = 'manus-browser-notifications'
-const SOUND_KEY = 'manus-sound-reminder'
+const NOTIFICATION_KEY = 'build-x-browser-notifications'
+const SOUND_KEY = 'build-x-sound-reminder'
 
 function readBool(key: string, fallback: boolean): boolean {
   try {

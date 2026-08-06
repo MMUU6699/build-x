@@ -34,11 +34,11 @@ const { t } = useI18n()
 const links = [
   {
     title: 'Documentation',
-    href: 'https://docs.ai-manus.com/#/en/',
+    href: 'https://docs.build-x.example/#/en/', // TODO: استبدل هذا بنطاق التوثيق الحقيقي عند توفره
   },
   {
     title: 'GitHub Issues',
-    href: 'https://github.com/simpleyyt/ai-manus/issues',
+    href: 'https://github.com/MMUU6699/build-x/issues',
   },
 ]
 </script>

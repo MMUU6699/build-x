@@ -1,5 +1,9 @@
 <template>
   <AuthFormLayout @submit="handleSubmit">
+    <template v-if="showOAuth">
+      <OAuthButtons />
+    </template>
+
     <FormField id="email" :label="t('Email')" v-model="formData.email" :error="validationErrors.email"
       placeholder="mail@domain.com" type="email" :disabled="isLoading" @update:model-value="validateField('email')"
       @blur="validateField('email')" />
@@ -29,13 +33,14 @@ import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/api'
 import { validateUserInput } from '@/utils/auth'
 import { showErrorToast, showSuccessToast } from '@/utils/toast'
-import { getCachedAuthProvider } from '@/api/config'
+import { getCachedAuthProvider, getCachedClientConfig } from '@/api/config'
 import { useFormValidation } from '@/composables/useFormValidation'
 import AuthFormLayout from './AuthFormLayout.vue'
 import FormField from './FormField.vue'
 import PasswordField from './PasswordField.vue'
 import SubmitButton from './SubmitButton.vue'
 import FormFooterLink from './FormFooterLink.vue'
+import OAuthButtons from './OAuthButtons.vue'
 
 const { t } = useI18n()
 
@@ -47,6 +52,7 @@ const emits = defineEmits<{
 
 const { login, isLoading, authError } = useAuth()
 const hasRegister = ref(false)
+const showOAuth = ref(false)
 
 const formData = ref({
   email: '',
@@ -93,6 +99,10 @@ const handleSubmit = async () => {
 onMounted(async () => {
   const authProvider = await getCachedAuthProvider()
   hasRegister.value = authProvider === 'password'
+
+  const clientConfig = await getCachedClientConfig()
+  showOAuth.value = !!(clientConfig && authProvider !== 'none'
+    && clientConfig.supabase_url && clientConfig.supabase_anon_key)
 })
 
 // Expose clearForm method for parent component

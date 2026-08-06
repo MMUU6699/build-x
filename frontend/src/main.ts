@@ -6,13 +6,14 @@ import '@fontsource/libre-baskerville/700.css'
 import './assets/global.css'
 import './assets/theme.css'
 import './utils/toast'
-import i18n from './composables/useI18n'
+import i18n, { initLocale } from './composables/useI18n'
 import { router } from './router'
 import { getCachedClientConfig } from './api/config'
 import { configure } from "vue-gtag"
 import { initTheme } from './composables/useTheme'
 
 initTheme()
+initLocale()
 
 // Preload client runtime config and initialize Google Analytics.
 void getCachedClientConfig().then((config) => {

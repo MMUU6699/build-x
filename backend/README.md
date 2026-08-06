@@ -1,8 +1,8 @@
-# AI Manus × Claw Backend Service
+# Build X × Claw Backend Service
 
 English | [中文](README_zh.md)
 
-AI Manus × Claw is an intelligent conversation agent system based on FastAPI and LangChain chat models. The backend adopts Domain-Driven Design (DDD) architecture, supporting intelligent dialogue, file operations, Shell command execution, browser automation, and integrated [OpenClaw](https://github.com/anthropics/openclaw) AI assistant management (Claw).
+Build X × Claw is an intelligent conversation agent system based on FastAPI and LangChain chat models. The backend adopts Domain-Driven Design (DDD) architecture, supporting intelligent dialogue, file operations, Shell command execution, browser automation, and integrated [OpenClaw](https://github.com/anthropics/openclaw) AI assistant management (Claw).
 
 ## Project Architecture
 
@@ -39,7 +39,7 @@ backend/
    - Web search integration
 4. **Sandbox Environment**: Use Docker containers to provide isolated execution environments
 5. **VNC Visualization**: Support remote viewing of the sandbox environment via WebSocket connection
-6. **Claw (Manus × Claw)**: Per-user OpenClaw container lifecycle management, chat history merge (MongoDB + OpenClaw `.jsonl` sessions), WebSocket real-time messaging, file upload/resolve, and OpenAI-compatible LLM proxy for Claw containers
+6. **Claw (Build X × Claw)**: Per-user OpenClaw container lifecycle management, chat history merge (MongoDB + OpenClaw `.jsonl` sessions), WebSocket real-time messaging, file upload/resolve, and OpenAI-compatible LLM proxy for Claw containers
 
 ## Requirements
 
@@ -61,7 +61,7 @@ uv sync
 ```
 
 3. **Environment variable configuration**:
-Create a `.env` file and set the following environment variables (see `app/core/config.py` or the root [.env.example](https://github.com/simpleyyt/ai-manus/blob/main/.env.example) for the full list):
+Create a `.env` file and set the following environment variables (see `app/core/config.py` or the root [.env.example](https://github.com/MMUU6699/build-x/blob/main/.env.example) for the full list):
 ```
 # Model provider configuration
 API_KEY=your_api_key_here                # API key for model providers (required)
@@ -81,10 +81,10 @@ GOOGLE_SEARCH_ENGINE_ID=                 # Google custom search engine ID (SEARC
 
 # Sandbox configuration
 SANDBOX_ADDRESS=                         # Fixed sandbox address (dev); when unset, containers are created per session
-SANDBOX_IMAGE=simpleyyt/manus-sandbox    # Sandbox environment Docker image
+SANDBOX_IMAGE=your-dockerhub-username/build-x-sandbox    # Sandbox environment Docker image
 SANDBOX_NAME_PREFIX=sandbox              # Sandbox container name prefix
 SANDBOX_TTL_MINUTES=30                   # Sandbox container time-to-live (minutes)
-SANDBOX_NETWORK=manus-network            # Docker network name for communication between sandbox containers
+SANDBOX_NETWORK=build-x-network            # Docker network name for communication between sandbox containers
 
 # Authentication configuration
 AUTH_PROVIDER=password                   # password / local / none
@@ -92,7 +92,7 @@ JWT_SECRET_KEY=your-secret-key-here      # JWT signing key (set in production)
 
 # Claw (OpenClaw) configuration
 CLAW_ENABLED=false                       # Enable the Claw integration
-CLAW_IMAGE=simpleyyt/manus-claw          # Claw container Docker image
+CLAW_IMAGE=your-dockerhub-username/build-x-claw          # Claw container Docker image
 CLAW_TTL_SECONDS=3600                    # Claw container time-to-live (seconds)
 
 # MCP configuration
@@ -103,7 +103,7 @@ TASK_BACKEND=local                       # local (in-process asyncio) or celery 
 
 # Database configuration
 MONGODB_URI=mongodb://localhost:27017    # MongoDB connection URL
-MONGODB_DATABASE=manus                   # MongoDB database name
+MONGODB_DATABASE=build_x                   # MongoDB database name
 REDIS_HOST=localhost                     # Redis host
 REDIS_PORT=6379                          # Redis port
 REDIS_DB=0                               # Redis DB index
@@ -125,10 +125,10 @@ The service will start at http://localhost:8000.
 ### Docker Deployment
 ```bash
 # Build Docker image
-docker build -t manus-ai-agent .
+docker build -t build-x-ai-agent .
 
 # Run container
-docker run -p 8000:8000 --env-file .env -v /var/run/docker.sock:/var/run/docker.sock manus-ai-agent
+docker run -p 8000:8000 --env-file .env -v /var/run/docker.sock:/var/run/docker.sock build-x-ai-agent
 ```
 
 > Note: If using Docker deployment, you need to mount the Docker socket so the backend can create sandbox containers.
@@ -221,8 +221,8 @@ Event envelope: `{ type: "event", session_id, event, data }` where `event` is on
 | GET | `/claw/history` | Get merged Claw chat history |
 | POST | `/claw/upload` | Upload a file from the Claw workspace (Claw API key auth) |
 | GET | `/claw/files/{filename}` | Proxy a file download from the Claw workspace |
-| GET | `/claw/resolve/{file_id}` | Resolve `manus-file://` metadata (Claw API key auth) |
-| GET | `/claw/resolve/{file_id}/download` | Download `manus-file://` content (Claw API key auth) |
+| GET | `/claw/resolve/{file_id}` | Resolve `build-x-file://` metadata (Claw API key auth) |
+| GET | `/claw/resolve/{file_id}/download` | Download `build-x-file://` content (Claw API key auth) |
 
 ### Other Endpoints
 

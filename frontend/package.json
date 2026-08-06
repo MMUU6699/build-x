@@ -1,5 +1,5 @@
 {
-  "name": "manus-frontend",
+  "name": "build-x-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -55,5 +55,9 @@
     "vite-plugin-monaco-editor": "^1.1.0",
     "vitest": "^4.1.9",
     "vue-tsc": "^1.6.5"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "vue-demi@0.14.10": true
   }
 }

@@ -53,7 +53,7 @@ class SilentToolkit(BaseToolkit):
 class TestSystemPromptBuilder:
     def test_core_prompt_always_present(self):
         prompt = build_system_prompt()
-        assert "You are Manus" in prompt
+        assert "You are Build X" in prompt
         assert "<sandbox_environment>" in prompt
 
     def test_bound_toolkit_contributes_section(self):

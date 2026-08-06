@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: build-x-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: "pip install -e ."
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: files
+      - key: AUTH_PROVIDER
+        value: password
+      - key: DAYTONA_API_KEY
+        sync: false
+      - key: SANDBOX_IMAGE
+        value: ghcr.io/mmuu6699/build-x-sandbox:latest
+      - key: SANDBOX_TTL_MINUTES
+        value: "30"
+      - key: TASK_BACKEND
+        value: local
+      - key: API_KEY
+        sync: false
+      - key: API_BASE
+        sync: false
+      - key: MODEL_PROVIDER
+        value: openai
+      - key: MODEL_NAME
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: SESSION_COOKIE_SAMESITE
+        value: "none"
+      - key: FRONTEND_URL
+        sync: false
+
+  - type: web
+    name: build-x-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: "npm ci && npm run build"
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://build-x-backend.onrender.com

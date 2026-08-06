@@ -23,7 +23,7 @@ class DockerClawRuntime:
         docker_client = docker.from_env()
 
         claw_network = self.settings.claw_network
-        manus_api_base_url = self.settings.manus_api_base_url
+        build_x_api_base_url = self.settings.build_x_api_base_url
         container_name = f"{self.settings.claw_name_prefix}-{claw_id[:8]}"
 
         # Remove any stale container left over from a previous provisioning
@@ -45,8 +45,8 @@ class DockerClawRuntime:
             "remove": True,
             "environment": {
                 "CLAW_TTL_SECONDS": str(self.settings.claw_ttl_seconds),
-                "MANUS_API_KEY": api_key,
-                "MANUS_API_BASE_URL": manus_api_base_url,
+                "BUILD_X_API_KEY": api_key,
+                "BUILD_X_API_BASE_URL": build_x_api_base_url,
             },
         }
         if claw_network:

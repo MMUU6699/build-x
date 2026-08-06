@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6 w-full">
     <p class="text-[13px] text-[var(--text-tertiary)] leading-[18px]">
-      {{ t('Manage your identity information for Manus.') }}
+      {{ t('Manage your identity information for Build X.') }}
     </p>
 
     <div class="space-y-2">
@@ -9,7 +9,7 @@
         {{ t('Nickname') }}
       </div>
       <div
-        class="group rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 flex items-center gap-[10px] bg-[var(--fill-tsp-white-main)] pt-2 pr-3 pb-2 pl-4 focus-within:ring-[1.5px] focus-within:ring-[var(--border-dark)] w-full sm:w-[300px]"
+        class="group rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 flex items-center gap-[10px] bg-[var(--fill-tsp-white-main)] pt-2 pe-3 pb-2 ps-4 focus-within:ring-[1.5px] focus-within:ring-[var(--border-dark)] w-full sm:w-[300px]"
       >
         <input
           v-model="localFullname"
@@ -21,7 +21,7 @@
         >
       </div>
       <p class="text-[13px] text-[var(--text-tertiary)] leading-[18px]">
-        {{ t('Manus uses this information to personalize responses.') }}
+        {{ t('Build X uses this information to personalize responses.') }}
       </p>
     </div>
   </div>

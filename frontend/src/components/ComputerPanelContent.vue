@@ -1,19 +1,19 @@
 <template>
   <!-- Official ManusComputer: Header | Panel | Timeline | Planner -->
   <div
-    id="manus-agent-workspace"
+    id="build-x-agent-workspace"
     class="h-full flex flex-col bg-[var(--background-gray-main)]"
     :class="shellClass">
     <!-- ManusComputerHeader (mined eg) -->
     <div class="flex h-[56px] items-center gap-[8px] border-b border-[var(--border-main)] px-[16px] py-[12px]">
       <div class="flex min-w-0 flex-1 flex-col justify-center">
         <h2 class="truncate text-[14px] font-[500] text-[var(--text-primary)]">
-          {{ $t("{name}'s computer", { name: 'Manus' }) }}
+          {{ $t("{name}'s computer", { name: 'Build X' }) }}
         </h2>
         <div class="flex min-w-0 items-center gap-[8px] text-[var(--text-tertiary)] text-xs">
           <div class="" :title="usingLabel">
             <template v-if="toolInfo">
-              {{ $t('Manus is using') }}<span>{{ toolInfo.name }}</span>
+              {{ $t('Build X is using') }}<span>{{ toolInfo.name }}</span>
             </template>
             <template v-else>
               {{ $t('Waiting for instructions') }}
@@ -37,7 +37,7 @@
       </div>
 
       <div class="flex shrink-0 items-center gap-[4px]">
-        <!-- Use {product}'s computer — official button tokens -->
+        <!-- Use {product}'s computer â€” official button tokens -->
         <div v-if="!isShare" class="relative" ref="useComputerRef">
           <button
             type="button"
@@ -51,12 +51,12 @@
           </button>
           <div
             v-if="showUseComputer"
-            class="absolute right-0 top-[calc(100%+10px)] z-50 w-[min(480px,calc(100vw-32px))] rounded-[20px] border border-[var(--border-main)] bg-[var(--background-menu-white)] shadow-[0px_8px_32px_0px_var(--shadow-S)] p-4 flex flex-col gap-3">
+            class="absolute end-0 top-[calc(100%+10px)] z-50 w-[min(480px,calc(100vw-32px))] rounded-[20px] border border-[var(--border-main)] bg-[var(--background-menu-white)] shadow-[0px_8px_32px_0px_var(--shadow-S)] p-4 flex flex-col gap-3">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5 min-w-0">
                 <Monitor :size="20" class="text-[var(--icon-primary)] shrink-0" />
                 <h2 class="text-lg text-[var(--text-primary)] font-serif font-semibold truncate">
-                  {{ t("Use application on {product}'s computer", { product: 'Manus' }) }}
+                  {{ t("Use application on {product}'s computer", { product: 'Build X' }) }}
                 </h2>
               </div>
               <button
@@ -68,8 +68,8 @@
               </button>
             </div>
             <div class="text-[var(--text-secondary)] text-[13px] leading-[18px]">
-              <span>{{ t("You're about to use {product}'s computer. ", { product: 'Manus' }) }}</span>
-              <span class="text-[var(--text-primary)]">{{ t('When finished, please inform {product} of your changes to help it work effectively.', { product: 'Manus' }) }}</span>
+              <span>{{ t("You're about to use {product}'s computer. ", { product: 'Build X' }) }}</span>
+              <span class="text-[var(--text-primary)]">{{ t('When finished, please inform {product} of your changes to help it work effectively.', { product: 'Build X' }) }}</span>
             </div>
             <div class="flex justify-end gap-2 mt-[4px]">
               <button
@@ -169,7 +169,7 @@
         @mouseleave="hoverTooltip = false">
         <div class="absolute inset-x-0 h-[4px] rounded-full bg-[var(--fill-tsp-gray-dark)]" />
         <div
-          class="absolute left-0 h-[4px] rounded-full bg-[var(--text-blue)]"
+          class="absolute start-0 h-[4px] rounded-full bg-[var(--text-blue)]"
           :class="{ 'transition-[width]': !isScrubbing }"
           :style="{ width: `${progressPercent}%` }" />
         <div
@@ -273,7 +273,7 @@ const isStreamingAction = computed(() => props.toolContent?.status === 'calling'
 
 const usingLabel = computed(() => {
   if (!toolInfo.value) return t('Waiting for instructions');
-  return `${t('Manus is using')} ${toolInfo.value.name}`;
+  return `${t('Build X is using')} ${toolInfo.value.name}`;
 });
 
 const actionLabel = computed(() => {
@@ -282,7 +282,7 @@ const actionLabel = computed(() => {
   return arg ? `${toolInfo.value.function} ${arg}` : toolInfo.value.function;
 });
 
-const useComputerTitle = computed(() => t("Use {product}'s computer", { product: 'Manus' }));
+const useComputerTitle = computed(() => t("Use {product}'s computer", { product: 'Build X' }));
 
 const hoverTimeLabel = computed(() => {
   const d = new Date(hoverTs.value * 1000);
@@ -470,7 +470,7 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
-  const root = document.getElementById('manus-agent-workspace');
+  const root = document.getElementById('build-x-agent-workspace');
   if (!root) return;
   const sel = window.getSelection();
   const end = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).endContainer : null;

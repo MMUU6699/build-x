@@ -33,19 +33,19 @@
 ```yaml
 services:
   frontend:
-    image: simpleyyt/manus-frontend
+    image: your-dockerhub-username/build-x-frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
     environment:
       - BACKEND_URL=http://backend:8000
 
   backend:
-    image: simpleyyt/manus-backend
+    image: your-dockerhub-username/build-x-backend
     depends_on:
       - sandbox
       - claw
@@ -54,25 +54,25 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       #- ./mcp.json:/etc/mcp.json # Mount MCP servers directory
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       # All configuration is loaded from the .env file, see .env.example
-      # More configuration options: https://docs.ai-manus.com/#/configuration
+      # More configuration options: https://docs.build-x.example/#/configuration
       - .env
 
   sandbox:
-    image: simpleyyt/manus-sandbox
+    image: your-dockerhub-username/build-x-sandbox
     command: /bin/sh -c "exit 0"  # prevent sandbox from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
   claw:
-    image: simpleyyt/manus-claw
+    image: your-dockerhub-username/build-x-claw
     entrypoint: /bin/sh -c "exit 0"  # prevent claw from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
   mongodb:
     image: mongo:7.0
@@ -82,21 +82,21 @@ services:
     #ports:
     #  - "27017:27017"
     networks:
-      - manus-network
+      - build-x-network
 
   redis:
     image: redis:7.0
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
 volumes:
   mongodb_data:
-    name: manus-mongodb-data
+    name: build-x-mongodb-data
 
 networks:
-  manus-network:
-    name: manus-network
+  build-x-network:
+    name: build-x-network
     driver: bridge
 ```
 <!-- /docker-compose-example.yml -->
@@ -105,7 +105,7 @@ networks:
 
 ### 创建 `.env` 配置文件
 
-在 `docker-compose.yml` 同级目录下，基于 [`.env.example`](https://github.com/simpleyyt/ai-manus/blob/main/.env.example) 创建 `.env` 文件，至少需要修改 `API_KEY`，并根据模型服务调整 `API_BASE` 与 `MODEL_NAME`：
+在 `docker-compose.yml` 同级目录下，基于 [`.env.example`](https://github.com/MMUU6699/build-x/blob/main/.env.example) 创建 `.env` 文件，至少需要修改 `API_KEY`，并根据模型服务调整 `API_BASE` 与 `MODEL_NAME`：
 
 ```ini
 API_KEY=sk-xxxx
@@ -139,7 +139,7 @@ MAX_TOKENS=2000
 
 # MongoDB configuration
 #MONGODB_URI=mongodb://mongodb:27017
-#MONGODB_DATABASE=manus
+#MONGODB_DATABASE=build_x
 #MONGODB_USERNAME=
 #MONGODB_PASSWORD=
 
@@ -151,10 +151,10 @@ MAX_TOKENS=2000
 
 # Sandbox configuration
 #SANDBOX_ADDRESS=
-SANDBOX_IMAGE=simpleyyt/manus-sandbox
+SANDBOX_IMAGE=your-dockerhub-username/build-x-sandbox
 SANDBOX_NAME_PREFIX=sandbox
 SANDBOX_TTL_MINUTES=30
-SANDBOX_NETWORK=manus-network
+SANDBOX_NETWORK=build-x-network
 #SANDBOX_CHROME_ARGS=
 #SANDBOX_HTTPS_PROXY=
 #SANDBOX_HTTP_PROXY=
@@ -274,13 +274,13 @@ JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
 # Enable or disable Claw feature (hides sidebar entry when false)
 #CLAW_ENABLED=false
 # Docker image used for Claw containers
-#CLAW_IMAGE=simpleyyt/manus-claw
+#CLAW_IMAGE=your-dockerhub-username/build-x-claw
 # Prefix for Claw container names
-#CLAW_NAME_PREFIX=manus-claw
+#CLAW_NAME_PREFIX=build-x-claw
 # Time-to-live for Claw containers in seconds (0 = unlimited)
 #CLAW_TTL_SECONDS=3600
 # Docker network bridge name for Claw containers
-#CLAW_NETWORK=manus-network
+#CLAW_NETWORK=build-x-network
 # Max seconds to wait for Claw container to become ready
 #CLAW_READY_TIMEOUT=300
 # Fixed Claw address (for development; skips Docker container creation)
@@ -288,7 +288,7 @@ JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
 # Static API key for Claw (for development / fixed container)
 #CLAW_API_KEY=
 # Backend API URL used by Claw containers for callbacks
-#MANUS_API_BASE_URL=http://backend:8000
+#BUILD_X_API_BASE_URL=http://backend:8000
 
 # Extra headers for LLM API requests (JSON format)
 #EXTRA_HEADERS={"X-Custom-Header": "value"}
@@ -319,7 +319,7 @@ docker compose up -d
 
 > 注意：如果提示 `sandbox-1 exited with code 0`，这是正常的，这是为了让 sandbox 镜像成功拉取到本地。
 
-打开浏览器访问 <http://localhost:5173> 即可访问 Manus。
+打开浏览器访问 <http://localhost:5173> 即可访问 Build X。
 
 ## 本地开发快速验证
 

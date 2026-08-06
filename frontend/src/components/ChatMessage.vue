@@ -1,7 +1,7 @@
 <template>
   <!--
     Official e9 (ChatQuestion shell, non-agent): flex flex-col group mt-6 w-full items-end
-    → max-w-[90%] → bubble (t2) → e4 toolbar below
+    â†’ max-w-[90%] â†’ bubble (t2) â†’ e4 toolbar below
     e4: flex items-center justify-end gap-[2px] overflow-hidden invisible group-hover:visible py-[2px]
          CopyChatEvent (default size-7) + EventTimestamp
   -->
@@ -36,7 +36,7 @@
         </template>
         <span
           v-if="showLiteBadge"
-          class="text-[var(--text-tertiary)] text-xs flex h-5 py-0.5 px-1.5 items-center gap-1 rounded-[6px] border border-[var(--border-dark)] flex-shrink-0 ml-[3px]">
+          class="text-[var(--text-tertiary)] text-xs flex h-5 py-0.5 px-1.5 items-center gap-1 rounded-[6px] border border-[var(--border-dark)] flex-shrink-0 ms-[3px]">
           Lite
         </span>
       </div>
@@ -110,7 +110,7 @@
         </template>
         <span
           v-if="showLiteBadge"
-          class="text-[var(--text-tertiary)] text-xs flex h-5 py-0.5 px-1.5 items-center gap-1 rounded-[6px] border border-[var(--border-dark)] flex-shrink-0 ml-[3px]">
+          class="text-[var(--text-tertiary)] text-xs flex h-5 py-0.5 px-1.5 items-center gap-1 rounded-[6px] border border-[var(--border-dark)] flex-shrink-0 ms-[3px]">
           Lite
         </span>
       </div>

@@ -19,7 +19,7 @@
           width="16"
           height="16"
           alt=""
-          class="float-left mr-2 mt-0.5 rounded-full border"
+          class="float-left me-2 mt-0.5 rounded-full border"
         >
         {{ result.title }}
       </a>

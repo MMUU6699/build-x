@@ -142,7 +142,7 @@ defineExpose({ activeTab })
       class="md:w-[221px] overflow-x-auto md:overflow-x-visible md:border-r border-[var(--border-main)] pb-2 md:pb-0 relative flex flex-col"
     >
       <h3
-        class="block md:hidden self-stretch pt-4 md:pt-5 px-4 md:px-5 pb-2 text-[18px] font-semibold leading-7 text-[var(--text-primary)] sticky left-0"
+        class="block md:hidden self-stretch pt-4 md:pt-5 px-4 md:px-5 pb-2 text-[18px] font-semibold leading-7 text-[var(--text-primary)] sticky start-0"
       >
         {{ t('Settings') }}
       </h3>
@@ -202,7 +202,7 @@ defineExpose({ activeTab })
             <template v-for="group in filteredGroups" :key="group.id">
               <div
                 v-if="group.label"
-                class="hidden md:block text-[var(--text-tertiary)] text-[13px] leading-[18px] pt-3 pr-3 pl-3.5 pb-1"
+                class="hidden md:block text-[var(--text-tertiary)] text-[13px] leading-[18px] pt-3 pe-3 ps-3.5 pb-1"
               >
                 {{ t(group.label) }}
               </div>

@@ -1,4 +1,4 @@
-# Settings Dialog Manus Parity (方案 C)
+# Settings Dialog Build X Parity (方案 C)
 
 Date: 2026-07-30  
 Status: approved for planning  
@@ -6,7 +6,7 @@ Surface: logged-in manus.im `#settings` → local `SettingsDialog`
 
 ## Goal
 
-直接抄 official Settings dialog chrome and personal-facing tabs into ai-manus. Match mined DOM / `className` tokens; omit product surfaces without local backend. Do not invent cards, fake billing, or connectors.
+直接抄 official Settings dialog chrome and personal-facing tabs into build-x. Match mined DOM / `className` tokens; omit product surfaces without local backend. Do not invent cards, fake billing, or connectors.
 
 ## Scope (C)
 
@@ -22,9 +22,9 @@ Surface: logged-in manus.im `#settings` → local `SettingsDialog`
 **Out (omit entire nav entries, no placeholders):**
 
 - Usage & Billing
-- Connectors / Skills / Mail Manus / My Computer
+- Connectors / Skills / Mail Build X / My Computer
 - Data management / Integrations / Developer / Cloud browser
-- Communication rows that need Manus marketing/email backend
+- Communication rows that need Build X marketing/email backend
 - Account rows: credits/plan, change email, manage login methods, delete account
 - Personalization: occupation, about you, knowledge, import memory, custom instructions
 
@@ -64,7 +64,7 @@ md:w-[221px] … md:border-r border-[var(--border-main)] … flex flex-col
 | Features | `personalization` | Personalization |
 | (footer) | `help` | Get help |
 
-Remove current Manus logo block from settings sidebar.
+Remove current Build X logo block from settings sidebar.
 
 ## Tab designs
 
@@ -78,7 +78,7 @@ Sections pasted from official:
 2. **Communication preferences** (subset)
    - Browser notifications — request/revoke `Notification` permission; toggle reflects permission + enabled flag
    - Sound reminder — play existing/local completion sound when enabled (wire to whatever completion path exists; if none yet, toggle persists preference for future hook)
-   - Omit: product updates email, queued-task email, Manus ads
+   - Omit: product updates email, queued-task email, Build X ads
 
 **Theme persistence:** apply `document.documentElement.classList` `dark` for Dark; remove for Light; Auto listens to `prefers-color-scheme`. Persist preference with the same approach as other UI chrome (composable + one key). This is chrome preference, not product data synced like favorites — allowed under replicate-manus-ui rule 7 exception for UI chrome. Do **not** invent a preferences Mongo API in this workstream unless already required elsewhere.
 

@@ -74,7 +74,7 @@ async def upload_claw_file(
     claw_service: ClawService = Depends(get_claw_service),
     file_service: FileService = Depends(get_file_service),
 ) -> APIResponse[FileInfoResponse]:
-    """Upload a file from the claw workspace to Manus storage (authenticated by claw API key)"""
+    """Upload a file from the claw workspace to Build X storage (authenticated by claw API key)"""
     user_id = await claw_service.verify_api_key(x_claw_api_key)
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid claw API key")
@@ -115,7 +115,7 @@ async def resolve_claw_file_meta(
     claw_service: ClawService = Depends(get_claw_service),
     file_service: FileService = Depends(get_file_service),
 ) -> APIResponse[FileInfoResponse]:
-    """Get file metadata for manus-file:// resolution (authenticated by claw API key)"""
+    """Get file metadata for build-x-file:// resolution (authenticated by claw API key)"""
     user_id = await claw_service.verify_api_key(x_claw_api_key)
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid claw API key")
@@ -132,7 +132,7 @@ async def resolve_claw_file_download(
     claw_service: ClawService = Depends(get_claw_service),
     file_service: FileService = Depends(get_file_service),
 ):
-    """Download file content for manus-file:// resolution (authenticated by claw API key)"""
+    """Download file content for build-x-file:// resolution (authenticated by claw API key)"""
     user_id = await claw_service.verify_api_key(x_claw_api_key)
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid claw API key")

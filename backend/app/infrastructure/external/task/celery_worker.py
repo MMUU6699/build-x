@@ -1,15 +1,13 @@
 """Celery worker-side execution of agent tasks.
 
-Each worker process lazily initializes its own event loop, MongoDB/Beanie and
-Redis connections, and the AgentTaskRunner factory. The agent coroutine is
-supervised by a cancel watcher that polls the Redis cancellation flag set by
-``CeleryTask.cancel()`` from any API replica.
+Each worker process lazily initializes its own event loop, PostgreSQL
+connections, and the AgentTaskRunner factory. The agent coroutine is
+supervised by a cancel watcher that polls the Postgres cancellation flag set
+by ``CeleryTask.cancel()`` from any API replica.
 """
 import asyncio
 import logging
 from typing import Any, Dict, Optional
-
-from beanie import init_beanie
 
 from app.core.config import get_settings
 from app.infrastructure.external.task.celery_app import celery_app, AGENT_TASK_NAME
@@ -42,65 +40,43 @@ def _get_loop() -> asyncio.AbstractEventLoop:
 def _build_runner_factory():
     """Composition root for the worker process (mirrors interfaces/dependencies.py)."""
     from app.domain.services.agent_task_runner import AgentTaskRunnerFactory
-    from app.infrastructure.external.sandbox.docker_sandbox import DockerSandbox
-    from app.infrastructure.external.file.gridfsfile import get_file_storage
+    from app.infrastructure.external.sandbox.daytona_sandbox import DaytonaSandbox
+    from app.infrastructure.external.file.supabase_storage import get_file_storage
     from app.infrastructure.external.search import get_search_engine
     from app.infrastructure.external.llm import get_llm
-    from app.infrastructure.repositories.mongo_agent_repository import MongoAgentRepository
-    from app.infrastructure.repositories.mongo_session_repository import MongoSessionRepository
-    from app.infrastructure.repositories.mongo_project_repository import MongoProjectRepository
+    from app.infrastructure.repositories.postgres_agent_repository import PostgresAgentRepository
+    from app.infrastructure.repositories.postgres_session_repository import PostgresSessionRepository
+    from app.infrastructure.repositories.postgres_project_repository import PostgresProjectRepository
     from app.infrastructure.repositories.file_mcp_repository import FileMCPRepository
 
     return AgentTaskRunnerFactory(
-        agent_repository=MongoAgentRepository(),
-        session_repository=MongoSessionRepository(),
-        sandbox_cls=DockerSandbox,
+        agent_repository=PostgresAgentRepository(),
+        session_repository=PostgresSessionRepository(),
+        sandbox_cls=DaytonaSandbox,
         file_storage=get_file_storage(),
         mcp_repository=FileMCPRepository(),
         llm=get_llm(),
         search_engine=get_search_engine(),
-        project_repository=MongoProjectRepository(),
+        project_repository=PostgresProjectRepository(),
     )
 
 
 async def _ensure_initialized() -> None:
-    """Initialize MongoDB/Beanie, Redis and the runner factory once per process."""
+    """Initialize PostgreSQL and the runner factory once per process."""
     global _initialized
     if _initialized:
         return
 
-    from app.infrastructure.storage.mongodb import get_mongodb
-    from app.infrastructure.storage.redis import get_redis
-    from app.infrastructure.models.documents import (
-        AgentDocument,
-        SessionDocument,
-        UserDocument,
-        ClawDocument,
-        ProjectDocument,
-        FileFavoriteDocument,
-    )
+    from app.infrastructure.storage.postgres import initialize as init_postgres
 
-    settings = get_settings()
-    await get_mongodb().initialize()
-    await init_beanie(
-        database=get_mongodb().client[settings.mongodb_database],
-        document_models=[
-            AgentDocument,
-            SessionDocument,
-            UserDocument,
-            ClawDocument,
-            ProjectDocument,
-            FileFavoriteDocument,
-        ],
-    )
-    await get_redis().initialize()
+    await init_postgres()
     CeleryTask.set_runner_factory(_build_runner_factory())
     _initialized = True
     logger.info("Celery worker process initialized")
 
 
 async def _watch_cancel(task_id: str, agent_task: asyncio.Task) -> None:
-    """Cancel the agent coroutine when the Redis cancellation flag appears."""
+    """Cancel the agent coroutine when the Postgres cancellation flag appears."""
     while not agent_task.done():
         if await is_cancel_requested(task_id):
             logger.info(f"Task {task_id} cancel flag detected, cancelling agent coroutine")

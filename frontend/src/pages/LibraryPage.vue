@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <!-- Single column scroll — do not put siblings under a flex-row SimpleBar -->
+    <!-- Single column scroll â€” do not put siblings under a flex-row SimpleBar -->
     <div class="w-full flex-1 min-h-0 overflow-y-auto">
       <div class="flex min-h-full flex-col bg-[var(--background-gray-main)]">
         <!-- Sticky toolbar (official e7) -->
@@ -133,7 +133,7 @@
                 @open="previewFile(file)"
                 @locate="openSession(file.session_id)"
                 @favorite="(v) => toggleFavorite(file, v)"
-                @send="sendToManus(file)"
+                @send="sendToBuildX(file)"
               />
             </div>
             <div v-else class="flex flex-col">
@@ -145,7 +145,7 @@
                 @open="previewFile(file)"
                 @locate="openSession(file.session_id)"
                 @favorite="(v) => toggleFavorite(file, v)"
-                @send="sendToManus(file)"
+                @send="sendToBuildX(file)"
               />
             </div>
           </div>
@@ -169,7 +169,7 @@
                   : 'gap-[12px] md:pb-[8px] pb-[6px] md:ps-[6px]'">
                 <button
                   type="button"
-                  class="min-w-0 truncate md:text-[16px] text-[14px] font-medium leading-[22px] text-[var(--text-primary)] hover:underline text-left"
+                  class="min-w-0 truncate md:text-[16px] text-[14px] font-medium leading-[22px] text-[var(--text-primary)] hover:underline text-start"
                   :class="viewMode === 'list' ? 'flex-1' : ''"
                   @click="openSession(group.sessionId)">
                   {{ group.title }}
@@ -192,7 +192,7 @@
                   @open="previewFile(file)"
                   @locate="openSession(file.session_id)"
                   @favorite="(v) => toggleFavorite(file, v)"
-                  @send="sendToManus(file)"
+                  @send="sendToBuildX(file)"
                 />
               </div>
               <template v-else>
@@ -204,7 +204,7 @@
                   @open="previewFile(file)"
                   @locate="openSession(file.session_id)"
                   @favorite="(v) => toggleFavorite(file, v)"
-                  @send="sendToManus(file)"
+                  @send="sendToBuildX(file)"
                 />
               </template>
 
@@ -314,7 +314,7 @@ const filteredFiles = computed(() => {
   })
 })
 
-/** Official: type/favorite/search → flat "file" mode; else session-grouped */
+/** Official: type/favorite/search â†’ flat "file" mode; else session-grouped */
 const browseMode = computed<'file' | 'session'>(() =>
   docType.value !== 'all' || filterFavorites.value || searchQuery.value.trim()
     ? 'file'
@@ -414,7 +414,7 @@ const toggleFavorite = async (file: LibraryFileItem, isFavorite: boolean) => {
   }
 }
 
-const sendToManus = async (file: LibraryFileItem) => {
+const sendToBuildX = async (file: LibraryFileItem) => {
   if (!file.file_id) return
   try {
     const session = await createSession()
@@ -433,7 +433,7 @@ const sendToManus = async (file: LibraryFileItem) => {
     })
   } catch (e) {
     console.error(e)
-    showErrorToast(t('Failed to send file to Manus'))
+    showErrorToast(t('Failed to send file to Build X'))
   }
 }
 

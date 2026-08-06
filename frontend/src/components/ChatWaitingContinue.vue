@@ -38,5 +38,5 @@ defineProps<{
 }>();
 
 const { t } = useI18n();
-const productName = computed(() => 'Manus');
+const productName = computed(() => 'Build X');
 </script>

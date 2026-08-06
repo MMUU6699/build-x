@@ -1,6 +1,6 @@
 <template>
   <!-- Official CodePreviewer (4445yl2k5als_.js / module 940882) -->
-  <div class="h-full w-full min-h-0 flex-1">
+  <div dir="ltr" class="h-full w-full min-h-0 flex-1">
     <MonacoEditor
       variant="codePreviewer"
       :value="content"

@@ -130,6 +130,7 @@ const themeMode = ref<ThemeMode>(readStoredThemeMode())
 const languageOptions: SelectOption[] = [
   { value: 'zh', label: t('Simplified Chinese') },
   { value: 'en', label: t('English') },
+  { value: 'ar', label: 'العربية' },
 ]
 
 const themeOptions: { value: ThemeMode; label: string; icon: Component }[] = [

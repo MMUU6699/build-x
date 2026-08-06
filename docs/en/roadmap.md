@@ -2,7 +2,7 @@
 
 > Ongoing: Deploy & Expose, multi-cluster deployment, enterprise sandbox security
 
-## Claw (Manus × Claw)
+## Claw (Build X × Claw)
 
  * [x] Integrated [OpenClaw](https://github.com/anthropics/openclaw) AI assistant
  * [x] One-click deployment with per-user isolated containers

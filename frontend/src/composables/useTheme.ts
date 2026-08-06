@@ -1,6 +1,6 @@
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
-const THEME_STORAGE_KEY = 'manus-theme-mode'
+const THEME_STORAGE_KEY = 'build-x-theme-mode'
 
 let mediaQuery: MediaQueryList | null = null
 let mediaHandler: ((e: MediaQueryListEvent) => void) | null = null

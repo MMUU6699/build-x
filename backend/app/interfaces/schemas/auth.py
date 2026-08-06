@@ -87,6 +87,19 @@ class ChangeFullnameRequest(BaseModel):
         return v.strip()
 
 
+class OAuthSessionRequest(BaseModel):
+    """OAuth login request — Supabase access token obtained via PKCE flow."""
+    access_token: str
+    client: Optional[str] = "web"
+
+    @field_validator('access_token')
+    @classmethod
+    def validate_access_token(cls, v):
+        if not v or len(v.strip()) < 10:
+            raise ValueError("A valid access token is required")
+        return v.strip()
+
+
 class RefreshTokenRequest(BaseModel):
     """Refresh token request — body optional when Cookie/Bearer present."""
     refresh_token: Optional[str] = None

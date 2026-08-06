@@ -1,8 +1,8 @@
-# AI Manus × Claw 后端服务
+# Build X × Claw 后端服务
 
 [English](README.md) | 中文
 
-AI Manus × Claw 是一个基于 FastAPI 和 LangChain Chat Model 的智能对话代理系统。该后端采用领域驱动设计(DDD)架构，支持智能对话、文件操作、Shell命令执行、浏览器自动化，以及集成 [OpenClaw](https://github.com/anthropics/openclaw) AI 助手管理（Claw）等功能。
+Build X × Claw 是一个基于 FastAPI 和 LangChain Chat Model 的智能对话代理系统。该后端采用领域驱动设计(DDD)架构，支持智能对话、文件操作、Shell命令执行、浏览器自动化，以及集成 [OpenClaw](https://github.com/anthropics/openclaw) AI 助手管理（Claw）等功能。
 
 ## 项目架构
 
@@ -39,7 +39,7 @@ backend/
    - 网络搜索集成
 4. **沙盒环境**：使用Docker容器提供隔离的执行环境
 5. **VNC可视化**：通过WebSocket连接支持远程查看沙盒环境
-6. **Claw（Manus × Claw）**：为每个用户管理 OpenClaw 容器生命周期，合并聊天历史（MongoDB + OpenClaw `.jsonl` 会话），WebSocket 实时通信，文件上传/解析，以及为 Claw 容器提供 OpenAI 兼容 LLM 代理
+6. **Claw（Build X × Claw）**：为每个用户管理 OpenClaw 容器生命周期，合并聊天历史（MongoDB + OpenClaw `.jsonl` 会话），WebSocket 实时通信，文件上传/解析，以及为 Claw 容器提供 OpenAI 兼容 LLM 代理
 
 ## 环境要求
 
@@ -61,7 +61,7 @@ uv sync
 ```
 
 3. **环境变量配置**:
-创建 `.env` 文件并设置以下环境变量（完整列表见 `app/core/config.py` 或根目录 [.env.example](https://github.com/simpleyyt/ai-manus/blob/main/.env.example)）:
+创建 `.env` 文件并设置以下环境变量（完整列表见 `app/core/config.py` 或根目录 [.env.example](https://github.com/MMUU6699/build-x/blob/main/.env.example)）:
 ```
 # Model provider configuration
 API_KEY=your_api_key_here                # 模型供应商 API 密钥（必填）
@@ -81,10 +81,10 @@ GOOGLE_SEARCH_ENGINE_ID=                 # Google 自定义搜索引擎 ID（SEA
 
 # Sandbox configuration
 SANDBOX_ADDRESS=                         # 固定沙盒地址（开发用）；未设置时按会话创建容器
-SANDBOX_IMAGE=simpleyyt/manus-sandbox    # 沙盒环境 Docker 镜像
+SANDBOX_IMAGE=your-dockerhub-username/build-x-sandbox    # 沙盒环境 Docker 镜像
 SANDBOX_NAME_PREFIX=sandbox              # 沙盒容器名称前缀
 SANDBOX_TTL_MINUTES=30                   # 沙盒容器生存时间（分钟）
-SANDBOX_NETWORK=manus-network            # Docker 网络名称，用于沙盒容器间通信
+SANDBOX_NETWORK=build-x-network            # Docker 网络名称，用于沙盒容器间通信
 
 # Authentication configuration
 AUTH_PROVIDER=password                   # password / local / none
@@ -92,7 +92,7 @@ JWT_SECRET_KEY=your-secret-key-here      # JWT 签名密钥（生产环境必须
 
 # Claw (OpenClaw) configuration
 CLAW_ENABLED=false                       # 是否启用 Claw 集成
-CLAW_IMAGE=simpleyyt/manus-claw          # Claw 容器 Docker 镜像
+CLAW_IMAGE=your-dockerhub-username/build-x-claw          # Claw 容器 Docker 镜像
 CLAW_TTL_SECONDS=3600                    # Claw 容器生存时间（秒）
 
 # MCP configuration
@@ -103,7 +103,7 @@ TASK_BACKEND=local                       # local（进程内 asyncio）或 celer
 
 # Database configuration
 MONGODB_URI=mongodb://localhost:27017    # MongoDB 连接 URL
-MONGODB_DATABASE=manus                   # MongoDB 数据库名称
+MONGODB_DATABASE=build_x                   # MongoDB 数据库名称
 REDIS_HOST=localhost                     # Redis 主机地址
 REDIS_PORT=6379                          # Redis 端口
 REDIS_DB=0                               # Redis 数据库编号
@@ -125,10 +125,10 @@ uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ### Docker部署
 ```bash
 # 构建Docker镜像
-docker build -t manus-ai-agent .
+docker build -t build-x-ai-agent .
 
 # 运行容器
-docker run -p 8000:8000 --env-file .env -v /var/run/docker.sock:/var/run/docker.sock manus-ai-agent
+docker run -p 8000:8000 --env-file .env -v /var/run/docker.sock:/var/run/docker.sock build-x-ai-agent
 ```
 
 > 注意：如果使用Docker部署，需要挂载Docker套接字以便后端可以创建沙盒容器。
@@ -221,8 +221,8 @@ docker run -p 8000:8000 --env-file .env -v /var/run/docker.sock:/var/run/docker.
 | GET | `/claw/history` | 获取合并后的 Claw 聊天历史 |
 | POST | `/claw/upload` | 从 Claw 工作区上传文件（Claw API 密钥认证） |
 | GET | `/claw/files/{filename}` | 代理下载 Claw 工作区中的文件 |
-| GET | `/claw/resolve/{file_id}` | 解析 `manus-file://` 元信息（Claw API 密钥认证） |
-| GET | `/claw/resolve/{file_id}/download` | 下载 `manus-file://` 内容（Claw API 密钥认证） |
+| GET | `/claw/resolve/{file_id}` | 解析 `build-x-file://` 元信息（Claw API 密钥认证） |
+| GET | `/claw/resolve/{file_id}/download` | 下载 `build-x-file://` 内容（Claw API 密钥认证） |
 
 ### 其它接口
 

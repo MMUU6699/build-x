@@ -7,14 +7,14 @@
       </template>
       <div class="w-full relative">
         <input v-model="formData.verificationCode"
-          class="rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 w-full disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[var(--fill-input-chat)] pt-1 pb-1 pl-3 focus:ring-[1.5px] focus:ring-[var(--border-dark)] pr-[128px]"
+          class="rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 w-full disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[var(--fill-input-chat)] pt-1 pb-1 ps-3 focus:ring-[1.5px] focus:ring-[var(--border-dark)] pe-[128px]"
           :class="{ 'ring-1 ring-[var(--function-error)]': validationErrors.verificationCode }"
           :placeholder="t('Enter 6-digit verification code')" id="verifyCode" type="text" maxlength="6"
           pattern="[0-9]{6}" inputmode="numeric" :disabled="isLoading" @input="handleVerificationCodeInput"
           @blur="validateField('verificationCode')" @paste="handlePaste">
         <!-- Resend button or countdown -->
         <div
-          class="absolute w-[120px] z-[30] top-1/2 right-0 -translate-y-1/2 text-center border-l-[1px] border-l-color-[var(--border-main)] leading-[0px]">
+          class="absolute w-[120px] z-[30] top-1/2 end-0 -translate-y-1/2 text-center border-l-[1px] border-l-color-[var(--border-main)] leading-[0px]">
           <!-- Show resend button when countdown is 0 -->
           <div v-if="resendCooldown === 0"
             class="inline-flex min-w-[60px] justify-center items-center gap-[4px] text-[var(--text-blue)] text-[14px] font-[400] tracking-[0px] leading-[22px] select-none flex-1 cursor-pointer hover:opacity-80 active:opacity-70 duration-150"

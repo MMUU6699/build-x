@@ -2,7 +2,7 @@
 
 > 持续迭代中：Deploy & Expose、多集群部署、企业级沙盒安全
 
-## Claw（Manus × Claw）
+## Claw（Build X × Claw）
 
  * [x] 集成 [OpenClaw](https://github.com/anthropics/openclaw) AI 助手
  * [x] 一键部署、用户隔离容器

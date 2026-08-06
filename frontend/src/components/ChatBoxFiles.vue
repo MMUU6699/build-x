@@ -1,7 +1,7 @@
 <template>
     <div v-if="files.length > 0" class="w-full relative rounded-md overflow-hidden flex-shrink-0 pb-3 -mb-3">
         <div v-if="canScrollLeft"
-            class="absolute top-0 bottom-0 left-0 z-10 flex h-full items-center gap-2.5 px-3 cursor-pointer"
+            class="absolute top-0 bottom-0 start-0 z-10 flex h-full items-center gap-2.5 px-3 cursor-pointer"
             style="background-image: linear-gradient(270deg, var(--gradual-white-0) 0%, var(--fill-input-chat) 100%);">
             <div
                 class="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border-white)] bg-[var(--background-menu-white)] overflow-hidden cursor-pointer hover:bg-[var(--fill-tsp-primary)] shadow-[0_0_1.25px_0_var(--shadow-M),0_5px_16px_0_var(--shadow-M)] backdrop-blur-[40px]">
@@ -12,10 +12,10 @@
             </div>
         </div>
         <div ref="scrollContainer" @scroll="onScroll"
-            class="w-full overflow-y-hidden overflow-x-auto scrollbar-hide pb-[10px] -mb-[10px] pl-[10px] pr-2 flex">
+            class="w-full overflow-y-hidden overflow-x-auto scrollbar-hide pb-[10px] -mb-[10px] ps-[10px] pe-2 flex">
             <div class="flex gap-3">
                 <div v-for="file in files" :key="file.file_id" @click="handleFileClick(file)"
-                    class="flex items-center gap-1.5 p-2 pr-2.5 w-[280px] rounded-[10px] bg-[var(--fill-tsp-white-main)] group/attach relative overflow-hidden cursor-pointer hover:bg-[var(--fill-tsp-white-dark)]">
+                    class="flex items-center gap-1.5 p-2 pe-2.5 w-[280px] rounded-[10px] bg-[var(--fill-tsp-white-main)] group/attach relative overflow-hidden cursor-pointer hover:bg-[var(--fill-tsp-white-dark)]">
                     <div class="flex items-center justify-center w-8 h-8 rounded-md">
                         <div class="relative flex items-center justify-center">
                             <!-- Loading state -->
@@ -44,14 +44,14 @@
                                     :size="14" />
                             </div>
                             <div v-else-if="file.status === 'uploading'">{{ t('Uploading...') }}</div>
-                            <div v-else>{{ getFileTypeText(file.filename) }} · {{ formatFileSize(file.size) }}</div>
+                            <div v-else>{{ getFileTypeText(file.filename) }} Â· {{ formatFileSize(file.size) }}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div v-if="canScrollRight"
-            class="absolute top-0 bottom-0 right-0 z-10 flex h-full items-center gap-2.5 px-3 cursor-pointer"
+            class="absolute top-0 bottom-0 end-0 z-10 flex h-full items-center gap-2.5 px-3 cursor-pointer"
             style="background-image: linear-gradient(90deg, var(--gradual-white-0) 0%, var(--fill-input-chat) 100%);">
             <div
                 class="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border-white)] bg-[var(--background-menu-white)] overflow-hidden cursor-pointer hover:bg-[var(--fill-tsp-primary)] shadow-[0_0_1.25px_0_var(--shadow-M),0_5px_16px_0_var(--shadow-M)] backdrop-blur-[40px]">

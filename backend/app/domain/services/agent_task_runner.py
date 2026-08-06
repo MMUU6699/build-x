@@ -2,7 +2,10 @@ from typing import Any, Dict, Optional, AsyncGenerator, List, Type
 import asyncio
 import logging
 import os
-import debugpy
+try:
+    import debugpy
+except ImportError:
+    debugpy = None
 from pydantic import TypeAdapter
 from app.domain.models.message import Message, LLMMessage, Role
 from app.domain.models.event import (
@@ -304,7 +307,7 @@ class AgentTaskRunner(TaskRunner):
             
             # If debugger is attached, trigger breakpoint for debugging
             # You can also manually set ENABLE_DEBUG_BREAK=1 environment variable
-            if debugpy.is_client_connected() or os.getenv('ENABLE_DEBUG_BREAK'):
+            if debugpy and (debugpy.is_client_connected() or os.getenv('ENABLE_DEBUG_BREAK')):
                 logger.debug("Debugger detected, triggering breakpoint")
                 import traceback
                 traceback.print_exc()
@@ -322,7 +325,7 @@ class AgentTaskRunner(TaskRunner):
 
         session = await self._session_repository.find_by_id(self._session_id)
         system_content = (
-            "You are Manus, a helpful AI assistant in Chat mode. "
+            "You are Build X, a helpful AI assistant in Chat mode. "
             "Answer the user's questions clearly and concisely. "
             "You do not have access to tools, a computer, or the internet."
         )

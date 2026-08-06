@@ -1,4 +1,4 @@
-# Settings Dialog Manus Parity Implementation Plan
+# Settings Dialog Build X Parity Implementation Plan
 
 > **For agentic workers:** Execute task-by-task. Steps use checkbox syntax.
 
@@ -27,8 +27,8 @@
 - Create: `frontend/src/composables/useChromePrefs.ts`
 - Create: `frontend/src/composables/__tests__/useTheme.spec.ts`
 
-- [ ] Implement `ThemeMode = 'light' | 'dark' | 'auto'`, apply `.dark` on `document.documentElement`, persist `manus-theme-mode`
-- [ ] Persist notification/sound booleans `manus-browser-notifications`, `manus-sound-reminder`
+- [ ] Implement `ThemeMode = 'light' | 'dark' | 'auto'`, apply `.dark` on `document.documentElement`, persist `build-x-theme-mode`
+- [ ] Persist notification/sound booleans `build-x-browser-notifications`, `build-x-sound-reminder`
 - [ ] Unit test theme apply light/dark/auto
 - [ ] Commit when green (if user asked commits; else continue)
 
@@ -53,7 +53,7 @@
 - [ ] Account: fullname, email, user id+copy, logout
 - [ ] Shortcuts: New task ⌘/Ctrl+K read-only
 - [ ] Personalization: nickname → change-fullname
-- [ ] Help: docs.ai-manus.com + GitHub issues
+- [ ] Help: docs.build-x.example + GitHub issues
 
 ### Task 4: i18n + verify
 

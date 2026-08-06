@@ -1,7 +1,7 @@
 ---
 name: replicate-manus-ui
 description: >-
-  Replicate manus.im / manus.ai UI into ai-manus by mining official JS bundles
+  Replicate manus.im / manus.ai UI into build-x by mining official JS bundles
   and live DOM (Chrome CDP), then pasting className trees onto Vue — 直接抄,
   never approximate. Use when aligning SessionSidebar, Library, Project,
   Search, Computer, Chat header, Share, FilePreviewer, or any Manus UI parity;
@@ -12,7 +12,7 @@ description: >-
 
 # Replicate Manus UI
 
-Align ai-manus frontend with **logged-in manus.im** by **直接抄** official structure + Tailwind classNames from mined JS / live DOM.
+Align build-x frontend with **logged-in manus.im** by **直接抄** official structure + Tailwind classNames from mined JS / live DOM.
 
 **Not allowed:** screenshot vibes, “大概像 Library / 侧栏”, inventing pills/cards/headers, or adapting another page’s shell because it “felt close”. User feedback「整个样式不对，为啥不直接抄呢」= you approximated; stop and paste tokens.
 

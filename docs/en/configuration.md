@@ -101,7 +101,7 @@ API_KEY=sk-...
 | Configuration | Default Value | Required | Description |
 |---------------|---------------|----------|-------------|
 | `MONGODB_URI` | `mongodb://mongodb:27017` | No | MongoDB connection string |
-| `MONGODB_DATABASE` | `manus` | No | Database name |
+| `MONGODB_DATABASE` | `build_x` | No | Database name |
 | `MONGODB_USERNAME` | - | No | MongoDB username |
 | `MONGODB_PASSWORD` | - | No | MongoDB password |
 
@@ -123,10 +123,10 @@ API_KEY=sk-...
 | Configuration | Default Value | Required | Description |
 |---------------|---------------|----------|-------------|
 | `SANDBOX_ADDRESS` | - | No | Sandbox server address |
-| `SANDBOX_IMAGE` | `simpleyyt/manus-sandbox` | No | Docker sandbox image name |
+| `SANDBOX_IMAGE` | `your-dockerhub-username/build-x-sandbox` | No | Docker sandbox image name |
 | `SANDBOX_NAME_PREFIX` | `sandbox` | No | Sandbox container name prefix |
 | `SANDBOX_TTL_MINUTES` | `30` | No | Sandbox time-to-live in minutes |
-| `SANDBOX_NETWORK` | `manus-network` | No | Docker network name |
+| `SANDBOX_NETWORK` | `build-x-network` | No | Docker network name |
 | `SANDBOX_CHROME_ARGS` | - | No | Chrome browser startup arguments |
 | `SANDBOX_HTTPS_PROXY` | - | No | HTTPS proxy settings |
 | `SANDBOX_HTTP_PROXY` | - | No | HTTP proxy settings |
@@ -137,14 +137,14 @@ API_KEY=sk-...
 | Configuration | Default Value | Required | Description |
 |---------------|---------------|----------|-------------|
 | `CLAW_ENABLED` | `false` | No | Enable Claw feature; set to `true` to show the sidebar entry |
-| `CLAW_IMAGE` | `simpleyyt/manus-claw` | No | Claw Docker image name |
-| `CLAW_NAME_PREFIX` | `manus-claw` | No | Claw container name prefix |
+| `CLAW_IMAGE` | `your-dockerhub-username/build-x-claw` | No | Claw Docker image name |
+| `CLAW_NAME_PREFIX` | `build-x-claw` | No | Claw container name prefix |
 | `CLAW_TTL_SECONDS` | `3600` | No | Claw container time-to-live in seconds; set to `0` for unlimited |
 | `CLAW_NETWORK` | - | No | Docker network bridge name for Claw containers |
 | `CLAW_READY_TIMEOUT` | `300` | No | Max seconds to wait for Claw container to become ready (default 5 minutes) |
 | `CLAW_ADDRESS` | - | No | Fixed Claw address (for development; skips Docker container creation) |
 | `CLAW_API_KEY` | - | No | Static API key (for development / fixed container) |
-| `MANUS_API_BASE_URL` | `http://backend:8000` | No | Backend API URL used by Claw containers for callbacks |
+| `BUILD_X_API_BASE_URL` | `http://backend:8000` | No | Backend API URL used by Claw containers for callbacks |
 
 ### Search Engine Configuration
 
@@ -255,7 +255,7 @@ Used only when `SEARCH_PROVIDER=custom`. Integrate any third-party search REST A
 |---------------|---------------|----------|-------------|
 | `AUTH_PROVIDER` | `password` | No | Authentication provider (`password`, `none`, or `local`) |
 | `SHOW_GITHUB_BUTTON` | `true` | No | Whether to show the GitHub button in the top bar |
-| `GITHUB_REPOSITORY_URL` | `https://github.com/simpleyyt/ai-manus` | No | GitHub button target URL |
+| `GITHUB_REPOSITORY_URL` | `https://github.com/MMUU6699/build-x` | No | GitHub button target URL |
 
 #### Password Authentication Configuration
 
@@ -311,7 +311,7 @@ Workers reuse the backend image and start via the `start_worker.sh` script; just
 
 ```yaml
   worker:
-    image: simpleyyt/manus-backend:latest
+    image: your-dockerhub-username/build-x-backend:latest
     command: ["./start_worker.sh"]
     depends_on:
       - mongodb
@@ -320,7 +320,7 @@ Workers reuse the backend image and start via the `start_worker.sh` script; just
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       - .env
     environment:

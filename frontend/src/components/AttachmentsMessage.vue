@@ -3,7 +3,7 @@
   <div v-if="content.role === 'user'" class="flex flex-col flex-wrap gap-2 items-end justify-end">
     <div class="flex gap-2 flex-wrap max-w-[568px] justify-end">
       <div v-for="attachment in content.attachments" :key="attachment.file_id" @click="showFilePreviewer(attachment)"
-        class="flex items-center gap-1.5 p-2 pr-2.5 w-[280px] group/attach relative overflow-hidden cursor-pointer rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[--background-tsp-menu-white]">
+        class="flex items-center gap-1.5 p-2 pe-2.5 w-[280px] group/attach relative overflow-hidden cursor-pointer rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[--background-tsp-menu-white]">
         <div class="flex items-center justify-center w-8 h-8 rounded-md">
           <div class="relative flex items-center justify-center">
             <component :is="getFileType(attachment.filename).icon" />
@@ -15,7 +15,7 @@
               class="text-sm text-[var(--text-primary)] text-ellipsis overflow-hidden whitespace-nowrap flex-1 min-w-0">
               {{ attachment.filename }}</div>
           </div>
-          <div class="text-xs text-[var(--text-tertiary)]">{{ getFileTypeText(attachment.filename) }} · {{
+          <div class="text-xs text-[var(--text-tertiary)]">{{ getFileTypeText(attachment.filename) }} Â· {{
             formatFileSize(attachment.size) }}</div>
         </div>
         <div
@@ -30,7 +30,7 @@
   <div v-else class="flex flex-col flex-wrap gap-2 justify-start">
     <div class="flex gap-2 flex-wrap max-w-[568px]">
       <div v-for="attachment in content.attachments" :key="attachment.file_id" @click="showFilePreviewer(attachment)"
-        class="flex items-center gap-1.5 p-2 pr-2.5 w-[280px] group/attach relative overflow-hidden cursor-pointer rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[--background-tsp-menu-white]">
+        class="flex items-center gap-1.5 p-2 pe-2.5 w-[280px] group/attach relative overflow-hidden cursor-pointer rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[--background-tsp-menu-white]">
         <div class="flex items-center justify-center w-8 h-8 rounded-md">
           <div class="relative flex items-center justify-center">
             <component :is="getFileType(attachment.filename).icon" />
@@ -42,7 +42,7 @@
               class="text-sm text-[var(--text-primary)] text-ellipsis overflow-hidden whitespace-nowrap flex-1 min-w-0">
               {{ attachment.filename }}</div>
           </div>
-          <div class="text-xs text-[var(--text-tertiary)]">{{ getFileTypeText(attachment.filename) }} · {{
+          <div class="text-xs text-[var(--text-tertiary)]">{{ getFileTypeText(attachment.filename) }} Â· {{
             formatFileSize(attachment.size) }}</div>
         </div>
         <div
@@ -51,7 +51,7 @@
         </div>
       </div>
       <button v-if="!props.hideAllFilesButton" @click="showAllFiles"
-        class="h-[54px] pl-4 pr-1.5 flex items-center justify-center gap-1.5 w-[280px] rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[var(--background-tsp-menu-white)]">
+        class="h-[54px] ps-4 pe-1.5 flex items-center justify-center gap-1.5 w-[280px] rounded-[12px] border-[0.5px] border-[var(--border-dark)] bg-[var(--background-menu-white)] hover:bg-[var(--background-tsp-menu-white)]">
         <FileSearch :size="16" />
         <span class="text-sm text-[var(--icon-secondary)]">{{ t('View all files in this task') }}</span>
       </button>

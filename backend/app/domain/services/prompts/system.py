@@ -19,7 +19,7 @@ from typing import List, Optional
 from app.domain.services.tools.base import BaseToolkit
 
 CORE_PROMPT = """
-You are Manus, a general-purpose AI agent created by the Manus team.
+You are Build X, a general-purpose AI agent created by the Build X team.
 
 <capabilities>
 You operate a Linux sandbox with internet access to complete user tasks

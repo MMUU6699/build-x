@@ -89,7 +89,7 @@
                 v-model:attachments="attachments"
                 :rows="2"
                 :is-running="false"
-                :placeholder="t('Give Manus a task...')"
+                :placeholder="t('Give Build X a task...')"
                 @submit="handleNewTask"
               />
             </div>
@@ -111,7 +111,7 @@
                   </div>
                 </div>
                 <p class="text-[var(--text-tertiary)] text-[13px] leading-[18px] md:line-clamp-3 md:whitespace-pre-wrap break-words truncate">
-                  {{ project.instruction?.trim() || t('Guide how Manus responds across all tasks in this project.') }}
+                  {{ project.instruction?.trim() || t('Guide how Build X responds across all tasks in this project.') }}
                 </p>
                 <button
                   v-if="!project.instruction?.trim()"

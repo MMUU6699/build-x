@@ -1,6 +1,6 @@
 <template>
   <div class="w-full min-h-[100vh] relative bg-[var(--background-gray-main)] dark:bg-[#050505]">
-    <div class="sticky top-0 left-0 w-full z-[10] px-[48px] max-sm:px-[12px] max-sm:bg-[var(--background-gray-login)]">
+    <div class="sticky top-0 start-0 w-full z-[10] px-[48px] max-sm:px-[12px] max-sm:bg-[var(--background-gray-login)]">
       <div class="w-full h-[60px] mx-auto flex items-center justify-between text-[var(--text-primary)]">
         <a href="/">
           <div class="flex gap-0.5 w-fit items-center">
@@ -20,8 +20,8 @@
           <h1 class="text-[20px] font-bold text-center text-[var(--text-primary)] max-sm:text-[18px]">
             {{ 
               isResettingPassword ? t('Reset Password') 
-              : isRegistering ? t('Register to Manus') 
-              : t('Login to Manus') 
+              : isRegistering ? t('Register to Build X') 
+              : t('Login to Build X') 
             }}
           </h1>
         </div>

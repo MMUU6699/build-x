@@ -1,7 +1,7 @@
 <template>
   <SimpleBar ref="simpleBarRef" @scroll="handleScroll">
     <div class="relative flex flex-col h-full flex-1 min-w-0 px-5">
-      <header class="sm:h-auto sticky top-0 left-0 right-0 z-10" style="background: var(--background-share-header);">
+      <header class="sm:h-auto sticky top-0 start-0 end-0 z-10" style="background: var(--background-share-header);">
         <div
           class="min-h-[52px] px-[16px] py-[10px] sm:px-5 sm:py-3 items-center flex justify-between bg-[var(--background-gray-main)]">
           <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 sm:flex-none"><a href="/" class="hidden sm:flex">
@@ -11,7 +11,7 @@
               </div>
             </a>
             <div
-              class="text-[var(--text-primary)] text-lg font-[600] leading-[24px] flex-1 min-w-0 text-left sm:text-center sm:hidden overflow-hidden text-ellipsis whitespace-nowrap">
+              class="text-[var(--text-primary)] text-lg font-[600] leading-[24px] flex-1 min-w-0 text-start sm:text-center sm:hidden overflow-hidden text-ellipsis whitespace-nowrap">
               {{ title }}</div>
           </div>
           <div
@@ -34,7 +34,7 @@
             @toolClick="handleToolClick" />
 
           <!-- Loading indicator: only before first visible replay output -->
-          <LoadingIndicator v-if="showThinking" :text="$t('{name} is thinking', { name: 'Manus' })" />
+          <LoadingIndicator v-if="showThinking" :text="$t('{name} is thinking', { name: 'Build X' })" />
           <div v-else-if="isLoading" aria-hidden="true" class="h-5 invisible" />
         </div>
 
@@ -44,11 +44,11 @@
             <ArrowDown class="text-[var(--icon-primary)]" :size="20" />
           </button>
           <div
-            class="bg-[var(--background-white-main)] rounded-xl border border-[var(--border-main)] shadow-[0px_5px_16px_0px_var(--shadow-S),0px_0px_1.25px_0px_var(--shadow-XS)] backdrop-blur-3xl flex items-center justify-between py-[9px] pr-3 pl-4 sm:flex-row flex-col max-sm:gap-3 max-sm:p-2">
+            class="bg-[var(--background-white-main)] rounded-xl border border-[var(--border-main)] shadow-[0px_5px_16px_0px_var(--shadow-S),0px_0px_1.25px_0px_var(--shadow-XS)] backdrop-blur-3xl flex items-center justify-between py-[9px] pe-3 ps-4 sm:flex-row flex-col max-sm:gap-3 max-sm:p-2">
             <div class="flex items-center gap-0.5 w-full sm:flex-1">
               <div class="w-6 h-6"><Bot :size="24" /></div>
               <div>
-                <p class="text-sm text-[var(--text-primary)]">{{ replayCompleted ? t('Manus task replay completed.') : t('Manus is replaying the task...') }}</p>
+                <p class="text-sm text-[var(--text-primary)]">{{ replayCompleted ? t('Build X task replay completed.') : t('Build X is replaying the task...') }}</p>
               </div>
             </div>
             <div class="flex items-center flex-row gap-[8px] max-sm:w-full">
@@ -63,7 +63,7 @@
     </div>
 
     <div v-if="showReplayOverlay"
-      class="fixed bottom-0 left-0 right-0 h-[calc(100vh - 156px)] z-50 flex items-center justify-center"
+      class="fixed bottom-0 start-0 end-0 h-[calc(100vh - 156px)] z-50 flex items-center justify-center"
       style="height: calc(-156px + 100vh); background: linear-gradient(rgba(255, 255, 255, 0) 5.99%, rgb(255, 255, 255) 35.84%);">
       <div class="flex flex-col items-center gap-4 p-2.5">
         <button @click="startReplay"
@@ -80,7 +80,7 @@
           </svg>
         </button>
         <div class="text-center text-[var(--text-primary)] whitespace-pre-line"
-          v-html="$t('You are viewing a completed Manus task. Replay will start automatically in {countdown} seconds.', { countdown: `<strong>${countdown}</strong>` })">
+          v-html="$t('You are viewing a completed Build X task. Replay will start automatically in {countdown} seconds.', { countdown: `<strong>${countdown}</strong>` })">
         </div>
       </div>
     </div>

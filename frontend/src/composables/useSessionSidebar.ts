@@ -1,8 +1,8 @@
 import { ref, watch } from 'vue'
 import type { SessionSidebarState } from '../types/panel'
 
-const SESSION_SIDEBAR_STATE_KEY = 'manus-session-sidebar-state'
-const LEGACY_LEFT_PANEL_STATE_KEY = 'manus-left-panel-state'
+const SESSION_SIDEBAR_STATE_KEY = 'build-x-session-sidebar-state'
+const LEGACY_LEFT_PANEL_STATE_KEY = 'build-x-left-panel-state'
 
 const getInitialSessionSidebarState = (): boolean => {
   try {

@@ -5,22 +5,13 @@ import logging
 import asyncio
 
 from app.core.config import get_settings
-from app.infrastructure.storage.mongodb import get_mongodb
-from app.infrastructure.storage.redis import get_redis
+from app.infrastructure.storage.postgres import initialize as init_postgres
+from app.infrastructure.storage.postgres import shutdown as shutdown_postgres
 from app.interfaces.dependencies import get_agent_service
 from app.interfaces.api.routes import router
 from app.interfaces.api.openai_routes import router as openai_router
 from app.infrastructure.logging import setup_logging
 from app.interfaces.errors.exception_handlers import register_exception_handlers
-from app.infrastructure.models.documents import (
-    AgentDocument,
-    SessionDocument,
-    UserDocument,
-    ClawDocument,
-    ProjectDocument,
-    FileFavoriteDocument,
-)
-from beanie import init_beanie
 
 # Initialize logging system
 setup_logging()
@@ -34,38 +25,19 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Code executed on startup
-    logger.info("Application startup - Manus AI Agent initializing")
-    
-    # Initialize MongoDB and Beanie
-    await get_mongodb().initialize()
+    logger.info("Application startup - Build X AI Agent initializing")
 
-    # Initialize Beanie
-    await init_beanie(
-        database=get_mongodb().client[settings.mongodb_database],
-        document_models=[
-            AgentDocument,
-            SessionDocument,
-            UserDocument,
-            ClawDocument,
-            ProjectDocument,
-            FileFavoriteDocument,
-        ]
-    )
-    logger.info("Successfully initialized Beanie")
-    
-    # Initialize Redis
-    await get_redis().initialize()
-    
+    # Initialize PostgreSQL (SQLAlchemy engine + tables on dev)
+    await init_postgres()
+    logger.info("Successfully initialized PostgreSQL")
+
     try:
         yield
     finally:
         # Code executed on shutdown
-        logger.info("Application shutdown - Manus AI Agent terminating")
-        # Disconnect from MongoDB
-        await get_mongodb().shutdown()
-        # Disconnect from Redis
-        await get_redis().shutdown()
-
+        logger.info("Application shutdown - Build X AI Agent terminating")
+        # Disconnect from PostgreSQL
+        await shutdown_postgres()
 
         logger.info("Cleaning up AgentService instance")
         try:
@@ -76,12 +48,16 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Error during AgentService cleanup: {str(e)}")
 
-app = FastAPI(title="Manus AI Agent", lifespan=lifespan)
+app = FastAPI(title="Build X AI Agent", lifespan=lifespan)
+
+allowed_origins = [url.strip() for url in (settings.frontend_url or "").split(",") if url.strip()]
+if not allowed_origins:
+    allowed_origins = ["http://localhost:5173"]
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

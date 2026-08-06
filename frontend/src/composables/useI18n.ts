@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import messages from '../locales'
 import type { Locale } from '../locales'
 
-const STORAGE_KEY = 'manus-locale'
+const STORAGE_KEY = 'build-x-locale'
 
 // Get browser language and map to supported locale
 const getBrowserLocale = (): Locale => {
@@ -12,10 +12,13 @@ const getBrowserLocale = (): Locale => {
   if (browserLang?.startsWith('zh')) {
     return 'zh'
   }
+  if (browserLang?.startsWith('ar')) {
+    return 'ar'
+  }
   if (browserLang?.startsWith('en')) {
     return 'en'
   }
-  // Default to Chinese if no match
+  // Default to English if no match
   return 'en'
 }
 
@@ -48,6 +51,7 @@ export function useLocale() {
     currentLocale.value = locale
     localStorage.setItem(STORAGE_KEY, locale)
     document.querySelector('html')?.setAttribute('lang', locale)
+    document.querySelector('html')?.setAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
   }
 
   // Watch language change
@@ -61,4 +65,11 @@ export function useLocale() {
   }
 }
 
-export default i18n 
+// Initialize locale attributes (lang/dir) on app startup to avoid FOUC
+export function initLocale() {
+  const locale = getStoredLocale()
+  document.querySelector('html')?.setAttribute('lang', locale)
+  document.querySelector('html')?.setAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
+}
+
+export default i18n

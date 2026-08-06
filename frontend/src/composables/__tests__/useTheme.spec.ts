@@ -45,12 +45,12 @@ describe('useTheme', () => {
 
   it('setThemeMode persists and applies', () => {
     setThemeMode('dark')
-    expect(localStorage.getItem('manus-theme-mode')).toBe('dark')
+    expect(localStorage.getItem('build-x-theme-mode')).toBe('dark')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 
   it('initTheme restores stored preference', () => {
-    localStorage.setItem('manus-theme-mode', 'light')
+    localStorage.setItem('build-x-theme-mode', 'light')
     expect(initTheme()).toBe('light')
     expect(document.documentElement.classList.contains('dark')).toBe(false)
   })

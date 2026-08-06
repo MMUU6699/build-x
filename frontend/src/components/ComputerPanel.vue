@@ -4,7 +4,7 @@
     ref="computerPanelRef"
     v-if="visible && presentation === 'sidebar'"
     :class="{
-      'h-full w-full top-0 ltr:right-0 rtl:left-0 z-50 fixed sm:sticky sm:top-0 sm:right-0 sm:h-[100vh] sm:min-w-[520px]': isShow,
+      'h-full w-full top-0 ltr:right-0 rtl:left-0 z-50 fixed sm:sticky sm:top-0 sm:end-0 sm:h-[100vh] sm:min-w-[520px]': isShow,
       'h-full overflow-hidden': !isShow
     }"
     :style="{ width: isShow ? `${sideWidth}px` : '0px', opacity: isShow ? '1' : '0', transition: '0.2s ease-in-out' }">
@@ -29,7 +29,7 @@
   </div>
 
   <Teleport to="body">
-    <!-- Official ChatComputerDialogPanel (z-upper → z-[1100]) -->
+    <!-- Official ChatComputerDialogPanel (z-upper â†’ z-[1100]) -->
     <div
       v-if="visible && isShow && toolContent && presentation === 'dialog'"
       class="fixed inset-0 w-full z-[1100] flex items-center justify-center py-[12px] bg-[var(--background-mask-black)] backdrop-blur-[12px]"

@@ -1,73 +1,76 @@
 """Celery-backed Task implementation.
 
-The API process only enqueues tasks and reads/writes Redis: agent execution
-happens in Celery worker processes (see celery_worker.py). Cross-process
-state lives entirely in Redis:
+The API process only enqueues tasks and reads/writes Postgres: agent
+execution happens in Celery worker processes (see celery_worker.py).
+Cross-process state lives entirely in Postgres:
 
-- ``task:input:{id}`` / ``task:output:{id}``  — Redis Streams for messages/events
-- ``task:meta:{id}``                          — task status + runner params (JSON)
-- ``task:cancel:{id}``                        — cancellation flag polled by the worker
+- ``task:input:{id}`` / ``task:output:{id}``  — stream queue rows for messages/events
+- ``task_meta`` row                             — task status + runner params (JSON)
+- ``task_cancel`` row                           — cancellation flag polled by the worker
 
 This makes tasks visible from any API replica and survives API restarts,
-unlike the in-process registry of RedisStreamTask.
+unlike the in-process registry of PostgresStreamTask.
 """
-import json
 import uuid
 import logging
 from typing import Any, Dict, Optional
+from datetime import datetime, UTC
+
+from sqlalchemy import delete
 
 from app.domain.external.task import Task, TaskRunnerFactory
-from app.infrastructure.external.message_queue.redis_stream_queue import RedisStreamQueue, MessageQueue
-from app.infrastructure.storage.redis import get_redis
+from app.infrastructure.external.message_queue.postgres_stream_queue import PostgresStreamQueue, MessageQueue
+from app.infrastructure.models.postgres import TaskCancelRow, TaskMetaRow
+from app.infrastructure.storage.postgres import get_session_factory
 from app.infrastructure.external.task.celery_app import celery_app, AGENT_TASK_NAME
 
 logger = logging.getLogger(__name__)
-
-META_TTL_SECONDS = 7 * 24 * 3600
-CANCEL_TTL_SECONDS = 3600
 
 STATUS_PENDING = "pending"
 STATUS_RUNNING = "running"
 STATUS_DONE = "done"
 
 
-def meta_key(task_id: str) -> str:
-    return f"task:meta:{task_id}"
-
-
-def cancel_key(task_id: str) -> str:
-    return f"task:cancel:{task_id}"
-
-
 async def read_meta(task_id: str) -> Optional[Dict[str, Any]]:
-    raw = await get_redis().client.get(meta_key(task_id))
-    if raw is None:
-        return None
-    try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        logger.warning(f"Invalid task meta for {task_id}: {raw}")
-        return None
+    async with get_session_factory()() as db:
+        row = await db.get(TaskMetaRow, task_id)
+        if row is None:
+            return None
+        return {"status": row.status, "params": row.params}
 
 
 async def write_meta(task_id: str, status: str, params: Optional[Dict[str, Any]] = None) -> None:
-    meta = await read_meta(task_id) or {}
-    meta["status"] = status
-    if params is not None:
-        meta["params"] = params
-    await get_redis().client.set(meta_key(task_id), json.dumps(meta), ex=META_TTL_SECONDS)
+    async with get_session_factory()() as db:
+        row = await db.get(TaskMetaRow, task_id)
+        if row is None:
+            row = TaskMetaRow(task_id=task_id, status=status, params=params)
+            db.add(row)
+        else:
+            row.status = status
+            if params is not None:
+                row.params = params
+            row.updated_at = datetime.now(UTC)
+        await db.commit()
 
 
 async def request_cancel(task_id: str) -> None:
-    await get_redis().client.set(cancel_key(task_id), "1", ex=CANCEL_TTL_SECONDS)
+    async with get_session_factory()() as db:
+        row = await db.get(TaskCancelRow, task_id)
+        if row is None:
+            db.add(TaskCancelRow(task_id=task_id))
+            await db.commit()
 
 
 async def is_cancel_requested(task_id: str) -> bool:
-    return bool(await get_redis().client.exists(cancel_key(task_id)))
+    async with get_session_factory()() as db:
+        row = await db.get(TaskCancelRow, task_id)
+        return row is not None
 
 
 async def clear_cancel(task_id: str) -> None:
-    await get_redis().client.delete(cancel_key(task_id))
+    async with get_session_factory()() as db:
+        await db.execute(delete(TaskCancelRow).where(TaskCancelRow.task_id == task_id))
+        await db.commit()
 
 
 class CeleryTask(Task):
@@ -78,8 +81,8 @@ class CeleryTask(Task):
     def __init__(self, task_id: str, params: Optional[Dict[str, Any]] = None):
         self._id = task_id
         self._params = params
-        self._input_stream = RedisStreamQueue(f"task:input:{task_id}")
-        self._output_stream = RedisStreamQueue(f"task:output:{task_id}")
+        self._input_stream = PostgresStreamQueue(f"task:input:{task_id}")
+        self._output_stream = PostgresStreamQueue(f"task:output:{task_id}")
 
     @property
     def id(self) -> str:
@@ -97,7 +100,7 @@ class CeleryTask(Task):
         return self._output_stream
 
     async def is_done(self) -> bool:
-        """Check if the task is done (from Redis metadata)."""
+        """Check if the task is done (from Postgres metadata)."""
         meta = await read_meta(self._id)
         if meta is None:
             return True
@@ -146,11 +149,7 @@ class CeleryTask(Task):
 
     @classmethod
     async def get(cls, task_id: str) -> Optional["CeleryTask"]:
-        """Get a task handle by its ID (from Redis metadata).
-
-        Returns:
-            Optional[CeleryTask]: Task handle if the task exists, None otherwise
-        """
+        """Get a task handle by its ID (from Postgres metadata)."""
         meta = await read_meta(task_id)
         if meta is None:
             return None

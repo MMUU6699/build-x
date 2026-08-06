@@ -1,7 +1,7 @@
 ---
 name: demo-videos
 description: >-
-  Record, upload, and sync README demo MP4s for ai-manus. Use when
+  Record, upload, and sync README demo MP4s for Build X. Use when
   recording demos, updating demo videos, fixing README video embeds, working
   with docs/demos.yml, gh image, user-attachments, sync_demos.py, or local
   tmp/videos and tmp/screenshots (gitignored — never commit demo binaries).
@@ -57,12 +57,12 @@ PY
 ```
 
 Then open `/` (not `/chat/<old-id>`). Expand the sidebar if the demo needs it
-(`localStorage.manus-session-sidebar-state = true`). Confirm **All Tasks** is empty before typing the first prompt.
+(`localStorage.build-x-session-sidebar-state = true`). Confirm **All Tasks** is empty before typing the first prompt.
 
 Fallback (wipes all DB sessions for the stack):
 
 ```bash
-./dev.sh exec -T mongodb mongosh manus --quiet --eval 'db.sessions.deleteMany({})'
+./dev.sh exec -T mongodb mongosh build_x --quiet --eval 'db.sessions.deleteMany({})'
 ```
 
 ## Publish gate (confirmation required)
@@ -108,7 +108,7 @@ git check-ignore -v tmp/videos/x.mp4 tmp/screenshots/x.jpg
 - `.gitignore` already covers `tmp/`.
 - Never `git add` MP4/WebM/demo JPG. Never recreate tracked files under `docs/assets/demos/` or `recordings/`.
 - What *does* get committed after a demo update: `docs/demos.yml`, regenerated README/docs via `.cursor/skills/update-docs/update_doc.sh`, and skill/docs text — **not** binaries.
-- Old local takes (e.g. `ai-manus-*-demo.*`, `e2e-test-process.*`, `main-run-demo.*`) can stay or be deleted under `tmp/`; they are not part of the published catalog.
+- Old local takes (e.g. `build-x-*-demo.*`, `e2e-test-process.*`, `main-run-demo.*`) can stay or be deleted under `tmp/`; they are not part of the published catalog.
 
 Preferred output names for the three README demos: `basic.mp4`, `browser-use.mp4`, `code-use.mp4` in `tmp/videos/`.
 
@@ -131,7 +131,7 @@ Playwright / browser recordings almost always start with **~1–2s of solid whit
 **Before upload:**
 
 1. Extract the first frame and later samples; pure white ≈ mean luma `255`, variance `~0`.
-2. Find the first timestamp where the Manus UI is visible (not solid white).
+2. Find the first timestamp where the app UI is visible (not solid white).
 3. Re-encode with `-ss <that time>` (often `1.5`) so frame 0 is real UI.
 4. Re-check the new file’s first frame before `gh image`.
 
@@ -206,7 +206,7 @@ Produce MP4s under `tmp/videos/`. Prefer short, clear demos:
 
 **Basic Features** should showcase **multi-session switching**, not a single agent run:
 clear the session list first (see Clean initial state), expand the sidebar
-(`localStorage.manus-session-sidebar-state = true`), then create short sessions that
+(`localStorage.build-x-session-sidebar-state = true`), then create short sessions that
 mirror the other demos (e.g. a Code Use–style prompt, then **New Task**, then a
 Browser Use–style prompt such as “找一下最新新闻” / “Find latest news”), and
 switch between them via **All Tasks**.
@@ -224,7 +224,7 @@ Do **not** run `gh image`, edit live `url`s, sync demo docs, or push those chang
 ```bash
 gh extension install drogers0/gh-image   # once
 gh image check-token                    # must print GitHub username
-gh image --repo Simpleyyt/ai-manus \
+gh image --repo MMUU6699/build-x \
   tmp/videos/basic.mp4 \
   tmp/videos/browser-use.mp4 \
   tmp/videos/code-use.mp4
@@ -266,7 +266,7 @@ token = subprocess.check_output(["gh", "auth", "token"], text=True).strip()
 md = Path("README.md").read_text().split("<!-- demos:readme:en -->")[1].split("<!-- /demos:readme:en -->")[0]
 req = urllib.request.Request(
     "https://api.github.com/markdown",
-    data=json.dumps({"text": md, "mode": "gfm", "context": "Simpleyyt/ai-manus"}).encode(),
+    data=json.dumps({"text": md, "mode": "gfm", "context": "MMUU6699/build-x"}).encode(),
     headers={
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github+json",

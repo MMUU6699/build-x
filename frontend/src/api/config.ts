@@ -6,6 +6,8 @@ export interface ClientConfigResponse {
   github_repository_url: string
   google_analytics_id: string | null
   claw_enabled: boolean
+  supabase_url: string | null
+  supabase_anon_key: string | null
 }
 
 let clientConfigCache: ClientConfigResponse | null = null

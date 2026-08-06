@@ -8,7 +8,7 @@
             <div class="p-0">
                 <h3 class="text-[var(--text-primary)] text-[18px] leading-[24px] font-semibold flex items-center"></h3>
             </div>
-            <header class="flex items-center pt-6 pr-6 pl-6 pb-2.5">
+            <header class="flex items-center pt-6 pe-6 ps-6 pb-2.5">
                 <h1 class="flex-1 text-[var(--text-primary)] text-lg font-semibold">{{ $t('All Files in This Task') }}</h1>
                 <div class="flex items-center gap-4">
                     <div @click="hideSessionFileList"

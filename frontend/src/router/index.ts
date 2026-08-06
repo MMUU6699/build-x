@@ -67,6 +67,10 @@ export const router = createRouter({
     {
       path: '/login',
       component: () => import('../pages/LoginPage.vue')
+    },
+    {
+      path: '/oauth/callback',
+      component: () => import('../pages/OAuthCallbackPage.vue')
     }
   ]
 })

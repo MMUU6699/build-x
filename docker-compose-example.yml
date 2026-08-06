@@ -1,67 +1,65 @@
+# TODO: ضع اسم حسابك على Docker Hub هنا عند النشر (your-dockerhub-username)
 services:
   frontend:
-    image: simpleyyt/manus-frontend
+    image: your-dockerhub-username/build-x-frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
     environment:
       - BACKEND_URL=http://backend:8000
 
   backend:
-    image: simpleyyt/manus-backend
+    image: your-dockerhub-username/build-x-backend
     depends_on:
       - sandbox
       - claw
+      - db
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       #- ./mcp.json:/etc/mcp.json # Mount MCP servers directory
     networks:
-      - manus-network
+      - build-x-network
     env_file:
       # All configuration is loaded from the .env file, see .env.example
-      # More configuration options: https://docs.ai-manus.com/#/configuration
+      # More configuration options: https://docs.build-x.example/#/configuration
       - .env
 
   sandbox:
-    image: simpleyyt/manus-sandbox
+    image: your-dockerhub-username/build-x-sandbox
     command: /bin/sh -c "exit 0"  # prevent sandbox from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
   claw:
-    image: simpleyyt/manus-claw
+    image: your-dockerhub-username/build-x-claw
     entrypoint: /bin/sh -c "exit 0"  # prevent claw from starting, ensure image is pulled
     restart: "no"
     networks:
-      - manus-network
+      - build-x-network
 
-  mongodb:
-    image: mongo:7.0
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=build_x
+      - POSTGRES_PASSWORD=build_x
+      - POSTGRES_DB=build_x
     volumes:
-      - mongodb_data:/data/db
-    restart: unless-stopped
-    #ports:
-    #  - "27017:27017"
-    networks:
-      - manus-network
-
-  redis:
-    image: redis:7.0
+      - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - manus-network
+      - build-x-network
 
 volumes:
-  mongodb_data:
-    name: manus-mongodb-data
+  postgres_data:
+    name: build-x-postgres-data
 
 networks:
-  manus-network:
-    name: manus-network
+  build-x-network:
+    name: build-x-network
     driver: bridge
