@@ -28,11 +28,13 @@ import {
   storeRefreshToken,
   setAuthToken,
 } from '@/api/auth'
-import { consumePkcePair, exchangeOAuthCode } from '@/utils/oauth'
+import { getSessionFromOAuthCode } from '@/utils/oauth'
 import { showErrorToast, showSuccessToast } from '@/utils/toast'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
+
 const { t } = useI18n()
 
 onMounted(async () => {
@@ -52,16 +54,8 @@ onMounted(async () => {
     }
 
     const code = params.code as string | undefined
-    const state = params.state as string | undefined
-    if (!code || !state) {
+    if (!code) {
       showErrorToast(t('OAuth login failed, please try again'))
-      router.replace('/login')
-      return
-    }
-
-    const pair = consumePkcePair(state)
-    if (!pair) {
-      showErrorToast(t('OAuth login expired, please try again'))
       router.replace('/login')
       return
     }
@@ -73,16 +67,21 @@ onMounted(async () => {
       return
     }
 
-    const { access_token } = await exchangeOAuthCode(config, code, pair.verifier)
-    const response = await oauthLogin({ access_token })
+    const supabaseAccessToken = await getSessionFromOAuthCode(config, code)
+    const response = await oauthLogin({ access_token: supabaseAccessToken })
 
     storeToken(response.access_token)
     storeRefreshToken(response.refresh_token)
     setAuthToken(response.access_token)
 
+    const { loadCurrentUser } = useAuth()
+    await loadCurrentUser()
+
     showSuccessToast(t('Login successful! Welcome back'))
+
     const redirect = route.query.redirect as string | undefined
     router.replace(redirect && redirect.startsWith('/') ? redirect : '/')
+
   } catch (error) {
     console.error('OAuth callback failed:', error)
     showErrorToast(t('OAuth login failed, please try again'))

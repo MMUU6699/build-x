@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Build X AI Agent", lifespan=lifespan)
 
-allowed_origins = [url.strip() for url in (settings.frontend_url or "").split(",") if url.strip()]
+allowed_origins = [url.strip().rstrip('/') for url in (settings.frontend_url or "").split(",") if url.strip()]
 if not allowed_origins:
     allowed_origins = ["http://localhost:5173"]
 
@@ -58,10 +58,12 @@ if not allowed_origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Register exception handlers
 register_exception_handlers(app)

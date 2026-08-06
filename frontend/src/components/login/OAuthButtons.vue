@@ -32,12 +32,7 @@ import GoogleIcon from '@/components/icons/GoogleIcon.vue'
 import GithubIcon from '@/components/icons/GithubIcon.vue'
 import { getCachedClientConfig } from '@/api/config'
 import { showErrorToast } from '@/utils/toast'
-import {
-  buildOAuthAuthorizeUrl,
-  generatePkcePair,
-  storePkcePair,
-  type OAuthProvider,
-} from '@/utils/oauth'
+import { startOAuthSignIn, type OAuthProvider } from '@/utils/oauth'
 
 const { t } = useI18n()
 
@@ -52,9 +47,7 @@ const handleClick = async (provider: OAuthProvider) => {
       showErrorToast(t('OAuth is not configured'))
       return
     }
-    const pair = await generatePkcePair()
-    storePkcePair(pair)
-    window.location.href = buildOAuthAuthorizeUrl(config, provider, pair)
+    await startOAuthSignIn(config, provider)
   } catch (error) {
     console.error(`OAuth start failed (${provider}):`, error)
     showErrorToast(t('OAuth login failed, please try again'))
@@ -62,4 +55,5 @@ const handleClick = async (provider: OAuthProvider) => {
     busy.value = null
   }
 }
+
 </script>

@@ -49,4 +49,5 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://build-x-backend.onrender.com
+        value: https://build-x-backend-4nd4.onrender.com
+
