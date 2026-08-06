@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     sandbox_image: str = "ghcr.io/mmuu6699/build-x-sandbox:latest"
     sandbox_name_prefix: str | None = None
     sandbox_ttl_minutes: int | None = 30
-    sandbox_network: str | None = None  # Docker network bridge name
+    sandbox_network: str | None = None  # Legacy: Docker network bridge name (unused with Daytona)
     sandbox_chrome_args: str | None = ""
     sandbox_https_proxy: str | None = None
     sandbox_http_proxy: str | None = None
@@ -133,7 +133,7 @@ class Settings(BaseSettings):
     claw_image: str = "ghcr.io/mmuu6699/build-x-claw:latest"
     claw_name_prefix: str = "build-x-claw"
     claw_ttl_seconds: int = 3600
-    claw_network: str | None = None  # Docker network bridge name for claw containers
+    claw_network: str | None = None  # Legacy: Docker network bridge name for claw containers (unused with Daytona)
     claw_ready_timeout: int = 300  # Max seconds to wait for claw container to become ready
     claw_address: str | None = None  # If set, use this fixed host instead of creating Docker containers
     claw_api_key: str | None = None  # Static API key accepted by the LLM proxy (for dev/fixed container)
