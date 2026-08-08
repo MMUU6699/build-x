@@ -109,7 +109,7 @@ class Settings(BaseSettings):
     google_analytics_id: str | None = None
 
     # Auth configuration
-    auth_provider: str = "none"  # "password", "none", "local"
+    auth_provider: str = "password"  # "password", "none", "local"
     show_github_button: bool = True
     github_repository_url: str = "https://github.com/MMUU6699/build-x"
     password_salt: str | None = None
