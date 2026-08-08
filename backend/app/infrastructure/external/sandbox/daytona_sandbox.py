@@ -203,7 +203,7 @@ class DaytonaSandbox(Sandbox):
         finally:
             await self.client.aclose()
 
-    async def get_browser(self, user_id: str) -> Browser:
+    async def get_browser(self, user_id: str = "anonymous") -> Browser:
         """Get browser instance connected to sandbox CDP."""
         settings = get_settings()
         engine = settings.browser_engine.lower()
