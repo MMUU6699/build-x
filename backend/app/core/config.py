@@ -21,6 +21,20 @@ def _parse_extra_headers() -> dict | None:
     return None
 
 
+def _parse_extra_body() -> dict | None:
+    raw = os.environ.get("EXTRA_BODY")
+    if not raw:
+        return None
+    try:
+        body = json.loads(raw)
+        if isinstance(body, dict):
+            return body
+        logger.warning("EXTRA_BODY is not a JSON object, ignoring")
+    except json.JSONDecodeError:
+        logger.warning("EXTRA_BODY is not valid JSON, ignoring")
+    return None
+
+
 class Settings(BaseSettings):
     
     # Model provider configuration
@@ -53,6 +67,7 @@ class Settings(BaseSettings):
 
     # Daytona configuration
     daytona_api_key: str | None = None
+    daytona_api_url: str | None = None
     
     # Sandbox configuration
     sandbox_address: str | None = None
@@ -94,7 +109,7 @@ class Settings(BaseSettings):
     google_analytics_id: str | None = None
 
     # Auth configuration
-    auth_provider: str = "password"  # "password", "none", "local"
+    auth_provider: str = "none"  # "password", "none", "local"
     show_github_button: bool = True
     github_repository_url: str = "https://github.com/MMUU6699/build-x"
     password_salt: str | None = None
@@ -125,8 +140,9 @@ class Settings(BaseSettings):
     # Accept legacy JWT access tokens during migration; new logins issue Redis sessions
     session_jwt_grace_enabled: bool = True
     
-    # Extra headers for LLM requests (parsed from EXTRA_HEADERS env var, JSON)
+    # Extra headers and body for LLM requests (parsed from EXTRA_HEADERS / EXTRA_BODY env vars, JSON)
     extra_headers: dict | None = None
+    extra_body: dict | None = None
     
     # Claw (OpenClaw) configuration
     claw_enabled: bool = False
@@ -156,6 +172,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = (".env", "../.env")
         env_file_encoding = "utf-8"
+        extra = "ignore"
         
     def validate(self):
         """Validate configuration settings"""
@@ -169,5 +186,6 @@ def get_settings() -> Settings:
     if not os.environ.get("OPENAI_API_KEY") and settings.api_key:
         os.environ["OPENAI_API_KEY"] = settings.api_key
     settings.extra_headers = _parse_extra_headers()
+    settings.extra_body = _parse_extra_body()
     settings.validate()
     return settings 

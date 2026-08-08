@@ -95,6 +95,7 @@ class OpenAILLM:
         self._temperature = settings.temperature
         self._max_tokens = settings.max_tokens
         self._max_retries = max_retries
+        self._extra_body = settings.extra_body
         self._client = AsyncOpenAI(
             api_key=settings.api_key,
             base_url=settings.api_base,
@@ -166,7 +167,13 @@ class OpenAILLM:
         if errors:
             raise _ToolArgsParseError(errors)
 
-        return LLMMessage.assistant(content=message.content or "", tool_calls=tool_calls)
+        content = getattr(message, "content", "") or ""
+        if not content:
+            reasoning = getattr(message, "reasoning_content", None) or getattr(message, "reasoning", None)
+            if reasoning:
+                content = str(reasoning)
+
+        return LLMMessage.assistant(content=content, tool_calls=tool_calls)
 
     # ------------------------------------------------------------------
     # LLM Protocol
@@ -185,6 +192,8 @@ class OpenAILLM:
             temperature=self._temperature,
             max_tokens=self._max_tokens,
         )
+        if self._extra_body:
+            kwargs["extra_body"] = self._extra_body
         if tools:
             kwargs["tools"] = tools
             if tool_choice:

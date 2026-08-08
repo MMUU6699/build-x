@@ -72,3 +72,8 @@ register_exception_handlers(app)
 app.include_router(router, prefix="/api/v1")
 # OpenAI-compatible proxy (used by OpenClaw containers for LLM requests)
 app.include_router(openai_router)
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "build-x-backend"}

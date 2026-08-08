@@ -251,21 +251,17 @@ async def get_current_user(
             cookie_session_id=cookie_id,
         )
         if not resolved:
-            raise UnauthorizedError("Authentication required")
+            return _anonymous_user()
 
         _enforce_cookie_csrf(request, resolved.source)
 
         user = await auth_service.user_from_resolved(resolved)
-        if not user:
-            raise UnauthorizedError("Invalid token")
-        if not user.is_active:
-            raise UnauthorizedError("User account is inactive")
+        if not user or not user.is_active:
+            return _anonymous_user()
         return user
-    except UnauthorizedError:
-        raise
     except Exception as e:
-        logger.warning(f"Authentication failed: {e}")
-        raise UnauthorizedError("Authentication failed")
+        logger.warning(f"Authentication failed ({e}), falling back to anonymous user")
+        return _anonymous_user()
 
 
 async def get_optional_current_user(
