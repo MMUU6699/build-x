@@ -183,6 +183,13 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Get application settings"""
     settings = Settings()
+    
+    # --- TEMPORARY DEBUG FOR PHASE 1 ---
+    import logging
+    temp_logger = logging.getLogger(__name__)
+    temp_logger.info(f"PHASE 1 VERIFICATION: Using MODEL_NAME={settings.model_name}, API_BASE={settings.api_base}")
+    # -----------------------------------
+
     if not os.environ.get("OPENAI_API_KEY") and settings.api_key:
         os.environ["OPENAI_API_KEY"] = settings.api_key
     settings.extra_headers = _parse_extra_headers()

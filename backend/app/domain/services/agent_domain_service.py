@@ -53,14 +53,16 @@ class AgentDomainService:
 
     async def _create_task(self, session: Session) -> Task:
         """Create a new agent task"""
-        sandbox = None
-        sandbox_id = session.sandbox_id
-        if sandbox_id:
-            sandbox = await self._sandbox_cls.get(sandbox_id)
-        if not sandbox:
-            sandbox = await self._sandbox_cls.create()
-            session.sandbox_id = sandbox.id
-            await self._session_repository.save(session)
+        from app.domain.models.session import TaskMode
+        if session.task_mode != TaskMode.CHAT:
+            sandbox = None
+            sandbox_id = session.sandbox_id
+            if sandbox_id:
+                sandbox = await self._sandbox_cls.get(sandbox_id)
+            if not sandbox:
+                sandbox = await self._sandbox_cls.create()
+                session.sandbox_id = sandbox.id
+                await self._session_repository.save(session)
 
         params = AgentTaskRunnerFactory.build_params(
             session_id=session.id,

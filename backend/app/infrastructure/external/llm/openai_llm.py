@@ -86,6 +86,64 @@ class _ToolArgsParseError(Exception):
         self.errors = errors
 
 
+class PartialStringExtractor:
+    def __init__(self, key: str):
+        self.key_pattern = f'"{key}"'
+        self.buffer = ""
+        self.in_string = False
+        self.escaped = False
+        self.value_started = False
+        
+    def process_chunk(self, chunk: str) -> str:
+        if not chunk:
+            return ""
+            
+        self.buffer += chunk
+        if not self.value_started:
+            idx = self.buffer.find(self.key_pattern)
+            if idx != -1:
+                colon_idx = self.buffer.find(':', idx + len(self.key_pattern))
+                if colon_idx != -1:
+                    quote_idx = self.buffer.find('"', colon_idx + 1)
+                    if quote_idx != -1:
+                        self.value_started = True
+                        self.in_string = True
+                        extracted = self.buffer[quote_idx+1:]
+                        self.buffer = extracted
+                        return self._process_string_chunk(extracted, is_first=True)
+            return ""
+        else:
+            return self._process_string_chunk(chunk, is_first=False)
+            
+    def _process_string_chunk(self, text: str, is_first: bool) -> str:
+        if not self.in_string:
+            return ""
+            
+        result = ""
+        i = 0
+        while i < len(text):
+            c = text[i]
+            if self.escaped:
+                if c == 'n': result += '\n'
+                elif c == 't': result += '\t'
+                elif c == 'r': result += '\r'
+                elif c == '"': result += '"'
+                elif c == '\\': result += '\\'
+                else: result += c
+                self.escaped = False
+            elif c == '\\':
+                self.escaped = True
+            elif c == '"':
+                self.in_string = False
+                break
+            else:
+                result += c
+            i += 1
+            
+        return result
+
+
+
 class OpenAILLM:
     """Concrete :class:`LLM` gateway backed by the OpenAI Python SDK."""
 
@@ -280,6 +338,8 @@ class OpenAILLM:
             # Accumulate the final message while streaming
             assembled_content = ""
             assembled_tool_calls: Dict[int, Dict[str, Any]] = {}
+            tool_extractors: Dict[int, PartialStringExtractor] = {}
+
             
             try:
                 async for delta in self._create_stream(payload, tools, response_format, tool_choice):
@@ -296,8 +356,21 @@ class OpenAILLM:
                                     "type": "function",
                                     "function": {"name": tc.function.name or "", "arguments": ""}
                                 }
+                                # Attach extractors for known tools that should stream text
+                                fn_name = assembled_tool_calls[idx]["function"]["name"]
+                                if fn_name in ("message_notify_user", "message_ask_user"):
+                                    tool_extractors[idx] = PartialStringExtractor("text")
+                                elif fn_name == "complete_step":
+                                    tool_extractors[idx] = PartialStringExtractor("result")
+                            
                             if tc.function and tc.function.arguments:
-                                assembled_tool_calls[idx]["function"]["arguments"] += tc.function.arguments
+                                arg_delta = tc.function.arguments
+                                assembled_tool_calls[idx]["function"]["arguments"] += arg_delta
+                                
+                                if idx in tool_extractors:
+                                    extracted = tool_extractors[idx].process_chunk(arg_delta)
+                                    if extracted:
+                                        yield extracted
 
                 # Reconstruct raw message format to pass to _from_openai
                 raw_message = type("MockMessage", (), {})()

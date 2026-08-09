@@ -13,6 +13,7 @@ from app.domain.models.event import (
     ErrorEvent,
     TitleEvent,
     MessageEvent,
+    MessageDeltaEvent,
     DoneEvent,
     ToolEvent,
     WaitEvent,
@@ -347,14 +348,25 @@ class AgentTaskRunner(TaskRunner):
                 role = Role.USER if ev.role == "user" else Role.ASSISTANT
                 history.append(LLMMessage(role=role, content=ev.message))
 
-        reply = await self._llm.ask(history)
-        content = (reply.content or "").strip() or "(No response)"
-
         if session and not session.title:
             title = message.message.strip().replace("\n", " ")[:50]
             if title:
                 yield TitleEvent(title=title)
 
+        content = ""
+        try:
+            async for chunk_or_msg in self._llm.ask_stream(history):
+                if isinstance(chunk_or_msg, str):
+                    content += chunk_or_msg
+                    yield MessageDeltaEvent(content=chunk_or_msg)
+                else:
+                    reply = chunk_or_msg
+                    content = (reply.content or "").strip()
+        except NotImplementedError:
+            reply = await self._llm.ask(history)
+            content = (reply.content or "").strip()
+
+        content = content or "(No response)"
         yield MessageEvent(role="assistant", message=content)
         yield DoneEvent()
         logger.info(f"Agent {self._agent_id} completed chat-mode reply")
