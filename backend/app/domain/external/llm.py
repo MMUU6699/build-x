@@ -31,6 +31,26 @@ class LLM(Protocol):
         """
         ...
 
+    async def ask_stream(
+        self,
+        messages: List[LLMMessage],
+        tools: Optional[List[Dict[str, Any]]] = None,
+        response_format: Optional[str] = None,
+        tool_choice: Optional[str] = None,
+    ):
+        """Send a chat request and yield assistant message chunks.
+
+        Args:
+            messages: Full conversation context as domain messages.
+            tools: Optional OpenAI-style function schemas for tool calling.
+            response_format: Optional response format hint (e.g. ``json_object``).
+            tool_choice: Optional tool choice directive (e.g. ``none``).
+
+        Yields:
+            Chunks of text content and tool call deltas as they arrive.
+        """
+        ...
+        
     async def parse_json(self, text: str) -> Dict[str, Any]:
         """Extract/repair a JSON object from raw model output."""
         ...

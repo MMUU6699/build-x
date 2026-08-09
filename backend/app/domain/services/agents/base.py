@@ -2,7 +2,7 @@ import logging
 import asyncio
 import uuid
 from abc import ABC
-from typing import Any, List, Literal, Optional, AsyncGenerator
+from typing import Any, List, Literal, Optional, AsyncGenerator, Union
 from app.domain.models.message import Message, LLMMessage, Role, ToolCall
 from app.domain.services.tools.base import BaseToolkit, OutputTool, Tool, ValidationError
 from app.domain.models.event import (
@@ -181,16 +181,25 @@ class BaseAgent(ABC):
         """
         self._output_tool = output_tool
         try:
-            message = await self.ask(request)
+            message = None
+            async for item in self.ask_stream(request):
+                if isinstance(item, MessageDeltaEvent):
+                    yield item
+                else:
+                    message = item
             for _ in range(self.max_iterations):
                 if not message.tool_calls:
                     # Plain message: final answer for unstructured runs; for
                     # structured runs, nudge the model to use the output tool.
                     if not output_tool:
                         break
-                    message = await self.ask(
+                    async for item in self.ask_stream(
                         f"Submit your result by calling the `{output_tool.name}` tool."
-                    )
+                    ):
+                        if isinstance(item, MessageDeltaEvent):
+                            yield item
+                        else:
+                            message = item
                     continue
 
                 tool_responses = []
@@ -302,7 +311,12 @@ class BaseAgent(ABC):
                     yield StructuredOutputEvent(output=structured_output)
                     return
 
-                message = await self.ask_with_messages(tool_responses)
+                message = None
+                async for item in self.ask_with_messages_stream(tool_responses):
+                    if isinstance(item, MessageDeltaEvent):
+                        yield item
+                    else:
+                        message = item
             else:
                 yield ErrorEvent(error="Maximum iteration count reached, failed to complete the task")
 
@@ -347,6 +361,45 @@ class BaseAgent(ABC):
         await self._add_to_memory([message])
         return message
 
+    async def ask_with_messages_stream(self, messages: List[LLMMessage]) -> AsyncGenerator[Union[BaseEvent, LLMMessage], None]:
+        await self._add_to_memory(messages)
+
+        if self.memory.estimate_tokens() > self.max_context_tokens:
+            self.memory.compact(max_tokens=self.max_context_tokens)
+            await self._repository.save_memory(self._agent_id, self.name, self.memory)
+
+        context = list(self.memory.get_messages())
+        
+        message = None
+        # Support fallback if the llm gateway doesn't implement ask_stream (e.g. LangChain currently)
+        try:
+            async for chunk_or_msg in self._llm.ask_stream(
+                messages=context,
+                tools=self.get_tool_schemas(),
+                tool_choice=self.tool_choice,
+            ):
+                if isinstance(chunk_or_msg, str):
+                    yield MessageDeltaEvent(content=chunk_or_msg)
+                else:
+                    message = chunk_or_msg
+        except NotImplementedError:
+            message = await self._llm.ask(
+                messages=context,
+                tools=self.get_tool_schemas(),
+                tool_choice=self.tool_choice,
+            )
+            
+        logger.debug(f"Response from model: {message}")
+
+        await self._add_to_memory([message])
+        yield message
+
+    async def ask_stream(self, request: str) -> AsyncGenerator[Union[BaseEvent, LLMMessage], None]:
+        async for item in self.ask_with_messages_stream([
+            LLMMessage.user(request)
+        ]):
+            yield item
+            
     async def ask(self, request: str) -> LLMMessage:
         return await self.ask_with_messages([
             LLMMessage.user(request)

@@ -15,7 +15,7 @@ import json
 import logging
 import re
 from functools import lru_cache
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, AsyncGenerator
 
 from openai import AsyncOpenAI
 
@@ -238,6 +238,114 @@ class OpenAILLM:
                         },
                     ]
         # Unreachable: loop either returns or raises.
+        raise _ToolArgsParseError(["exhausted retries"])
+
+    async def _create_stream(
+        self,
+        messages: List[Dict[str, Any]],
+        tools: Optional[List[Dict[str, Any]]],
+        response_format: Optional[str],
+        tool_choice: Optional[str],
+    ) -> AsyncGenerator[Any, None]:
+        kwargs: Dict[str, Any] = dict(
+            model=self._model,
+            messages=messages,
+            temperature=self._temperature,
+            max_tokens=self._max_tokens,
+            stream=True,
+        )
+        if self._extra_body:
+            kwargs["extra_body"] = self._extra_body
+        if tools:
+            kwargs["tools"] = tools
+            if tool_choice:
+                kwargs["tool_choice"] = tool_choice
+        if response_format:
+            kwargs["response_format"] = {"type": response_format}
+            
+        stream = await self._client.chat.completions.create(**kwargs)
+        async for chunk in stream:
+            if chunk.choices:
+                yield chunk.choices[0].delta
+
+    async def ask_stream(
+        self,
+        messages: List[LLMMessage],
+        tools: Optional[List[Dict[str, Any]]] = None,
+        response_format: Optional[str] = None,
+        tool_choice: Optional[str] = None,
+    ):
+        payload = self._to_openai(messages)
+        for attempt in range(self._max_retries):
+            # Accumulate the final message while streaming
+            assembled_content = ""
+            assembled_tool_calls: Dict[int, Dict[str, Any]] = {}
+            
+            try:
+                async for delta in self._create_stream(payload, tools, response_format, tool_choice):
+                    if delta.content:
+                        assembled_content += delta.content
+                        yield delta.content
+                        
+                    if delta.tool_calls:
+                        for tc in delta.tool_calls:
+                            idx = tc.index
+                            if idx not in assembled_tool_calls:
+                                assembled_tool_calls[idx] = {
+                                    "id": tc.id or "",
+                                    "type": "function",
+                                    "function": {"name": tc.function.name or "", "arguments": ""}
+                                }
+                            if tc.function and tc.function.arguments:
+                                assembled_tool_calls[idx]["function"]["arguments"] += tc.function.arguments
+
+                # Reconstruct raw message format to pass to _from_openai
+                raw_message = type("MockMessage", (), {})()
+                raw_message.content = assembled_content
+                
+                if assembled_tool_calls:
+                    mock_tcs = []
+                    for idx in sorted(assembled_tool_calls.keys()):
+                        tc_data = assembled_tool_calls[idx]
+                        func_mock = type("MockFunction", (), {"name": tc_data["function"]["name"], "arguments": tc_data["function"]["arguments"]})()
+                        mock_tc = type("MockToolCall", (), {"id": tc_data["id"], "function": func_mock})()
+                        mock_tcs.append(mock_tc)
+                    raw_message.tool_calls = mock_tcs
+                else:
+                    raw_message.tool_calls = None
+                    
+                message = self._from_openai(raw_message)
+                logger.debug("Response from model (streamed): %s", message)
+                yield message
+                return
+                
+            except _ToolArgsParseError as e:
+                if attempt == self._max_retries - 1:
+                    raise
+                logger.warning(
+                    "Attempt %d/%d: tool call JSON parse failed in stream, retrying model: %s",
+                    attempt + 1,
+                    self._max_retries,
+                    e,
+                )
+                
+                # Append the failed assistant turn plus corrective feedback
+                assistant_msg = {"role": "assistant"}
+                if assembled_content:
+                    assistant_msg["content"] = assembled_content
+                if assembled_tool_calls:
+                    assistant_msg["tool_calls"] = [tc for _, tc in sorted(assembled_tool_calls.items())]
+                    
+                payload = payload + [
+                    assistant_msg,
+                    {
+                        "role": "user",
+                        "content": _TOOL_ARGS_RETRY_PROMPT.format(
+                            error="\n".join(e.errors)
+                        ),
+                    },
+                ]
+                
         raise _ToolArgsParseError(["exhausted retries"])
 
     async def parse_json(self, text: str) -> Dict[str, Any]:

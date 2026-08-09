@@ -114,6 +114,16 @@ class LangchainLLM:
     # LLM Protocol
     # ------------------------------------------------------------------
 
+    async def ask_stream(
+        self,
+        messages: List[LLMMessage],
+        tools: Optional[List[Dict[str, Any]]] = None,
+        response_format: Optional[str] = None,
+        tool_choice: Optional[str] = None,
+    ):
+        raise NotImplementedError("Streaming not yet implemented for LangChain")
+
+
     async def ask(
         self,
         messages: List[LLMMessage],

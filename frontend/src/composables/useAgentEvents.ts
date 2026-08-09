@@ -42,9 +42,49 @@ export function useAgentEvents(state: AgentEventState, options: AgentEventOption
     return messages.value.filter(message => message.type === 'step').pop()?.content as StepContent;
   };
 
+  const handleMessageDeltaEvent = (deltaData: { content: string }) => {
+    let lastMsg = messages.value[messages.value.length - 1];
+    
+    // If the last message is not an assistant message, or it's a completely different type, create a new bubble.
+    if (!lastMsg || lastMsg.type !== 'assistant') {
+      lastMsg = {
+        type: 'assistant',
+        content: {
+          role: 'assistant',
+          content: deltaData.content,
+          timestamp: new Date().toISOString()
+        } as MessageContent,
+      };
+      messages.value.push(lastMsg);
+    } else {
+      // Append content to existing message
+      (lastMsg.content as MessageContent).content += deltaData.content;
+    }
+  };
+
   const handleMessageEvent = (messageData: MessageEventData) => {
     // Skip blank assistant bubbles (e.g. empty create_plan.message from LLM)
     const text = (messageData.content ?? '').trim();
+    
+    // Deduplicate: if we just streamed this message via MessageDeltaEvent, update it instead of pushing a new one
+    const lastMsg = messages.value[messages.value.length - 1];
+    if (messageData.role === 'assistant' && lastMsg && lastMsg.type === 'assistant') {
+      const existingContent = (lastMsg.content as MessageContent).content;
+      // If the streamed content matches the final content (or is a prefix), we update it
+      if (existingContent && (text.includes(existingContent.trim()) || existingContent.includes(text))) {
+        (lastMsg.content as MessageContent).content = messageData.content;
+        if (messageData.attachments && messageData.attachments.length > 0) {
+          messages.value.push({
+            type: 'attachments',
+            content: {
+              ...messageData
+            } as AttachmentsContent,
+          });
+        }
+        return;
+      }
+    }
+    
     if (messageData.role === 'assistant' && !text) {
       if (messageData.attachments && messageData.attachments.length > 0) {
         messages.value.push({
@@ -147,6 +187,8 @@ export function useAgentEvents(state: AgentEventState, options: AgentEventOption
     }
     if (event.event === 'message') {
       handleMessageEvent(event.data as MessageEventData);
+    } else if (event.event === 'message_delta') {
+      handleMessageDeltaEvent(event.data as { content: string });
     } else if (event.event === 'tool') {
       handleToolEvent(event.data as ToolEventData);
     } else if (event.event === 'step') {

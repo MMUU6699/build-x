@@ -106,6 +106,12 @@ class MessageEvent(BaseEvent):
     message: str
     attachments: Optional[List[FileInfo]] = None
 
+class MessageDeltaEvent(BaseEvent):
+    """Incremental text chunk for streaming responses."""
+    type: Literal["message_delta"] = "message_delta"
+    content: str
+
+
 class DoneEvent(BaseEvent):
     """Done event"""
     type: Literal["done"] = "done"
@@ -142,6 +148,7 @@ AgentEvent = Union[
     ToolEvent,
     StepEvent,
     MessageEvent,
+    MessageDeltaEvent,
     DoneEvent,
     TitleEvent,
     WaitEvent,
