@@ -122,6 +122,15 @@ class DaytonaSandbox(Sandbox):
     @classmethod
     async def get(cls, sandbox_id: str) -> Optional["DaytonaSandbox"]:
         """Retrieve existing Daytona sandbox instance."""
+        if sandbox_id == "local-fallback-sandbox":
+            return cls(
+                sandbox_id="local-fallback-sandbox",
+                base_url="http://localhost:8080",
+                vnc_url="ws://localhost:5901",
+                cdp_url="http://localhost:9222",
+                auth_headers={},
+            )
+            
         settings = get_settings()
         try:
             try:
@@ -160,8 +169,8 @@ class DaytonaSandbox(Sandbox):
 
     async def ensure_sandbox(self) -> None:
         """Ensure sandbox is ready by checking supervisor status."""
-        max_retries = 30
-        retry_interval = 2
+        max_retries = 3
+        retry_interval = 1
 
         for attempt in range(max_retries):
             try:
