@@ -75,7 +75,16 @@ def get_agent_service() -> AgentService:
     file_storage = get_file_storage()
     search_engine = get_search_engine()
     mcp_repository = FileMCPRepository()
-    llm = get_llm()
+    
+    try:
+        llm = get_llm()
+    except Exception as exc:
+        logger.error("LLM gateway failed to initialize: %s — chat features will be unavailable until fixed", exc)
+        class FailingLLM:
+            async def ask(self, *args, **kwargs): raise exc
+            async def ask_stream(self, *args, **kwargs): raise exc
+            async def parse_json(self, *args, **kwargs): raise exc
+        llm = FailingLLM() # type: ignore
     
     # Register the factory used to rebuild task runners on the execution side.
     # For the local backend the runner is rebuilt in this process; for the

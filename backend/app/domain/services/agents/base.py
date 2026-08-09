@@ -11,6 +11,7 @@ from app.domain.models.event import (
     ToolStatus,
     ErrorEvent,
     MessageEvent,
+    MessageDeltaEvent,
     TerminalUpdateEvent,
 )
 from app.domain.repositories.agent_repository import AgentRepository
